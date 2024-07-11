@@ -9,12 +9,16 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <title>WA-BOT</title>
     </head>
-    <body>
+    <body class="bg-emerald-950 text-white">
         <%- include('navbar.ejs') %>
-        <main class="container mx-auto max-w-xl p-4">
-            <h1 class="text-2xl">
-                Hello, <%= hello %>!
-            </h1>
+        <main class="container p-4 mx-auto">
+            <div class="space-y-2">
+                <%- include('message.ejs') %>
+                <%- include('message.ejs') %>
+                <%- include('message.ejs') %>
+                <%- include('message.ejs') %>
+                <%- include('message.ejs') %>
+            </div>
         </main>
     </body>
     <script>
