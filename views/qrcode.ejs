@@ -1,0 +1,17 @@
+<!doctype html>
+<div>
+    <div id="qrcode"></div>
+    <script type="text/javascript">
+        const qrcode = document.getElementById("qrcode");
+        try {
+            new QRCode(qrcode, {
+                text: "<%= qrvalue %>",
+                width: 256,
+                height: 256,
+            });
+        } catch {
+            qrcode.innerHTML = "failed loading qrcode";
+            console.warn("has qrcodejs been imported?");
+        }
+    </script>
+</div>
