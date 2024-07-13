@@ -21,6 +21,11 @@ app.get('/qrcode', (req, res) => {
     }
 })
 
+app.get('/status', (req, res) => {
+    const status = wa.getStatus()
+    res.render('status', { status: status || 'unknown' })
+})
+
 port = process.env.PORT || '4807'
 app.listen(port, () => {
     console.log(`Express server running on http://localhost:${port}`)

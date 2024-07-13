@@ -1,8 +1,12 @@
 <!doctype html>
-<div class="p-2 bg-white">
+<div class="p-2 bg-white"
+    hx-get="/qrcode"
+    hx-trigger="load delay:32s"
+    hx-swap="outerHTML"
+>
     <div id="qrcode"></div>
     <script type="text/javascript">
-        const qrcode = document.getElementById("qrcode");
+        var qrcode = document.getElementById("qrcode");
         try {
             new QRCode(qrcode, {
                 text: "<%= qrvalue %>",

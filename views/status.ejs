@@ -1,0 +1,11 @@
+<!doctype html>
+<span hx-get="/status"
+    hx-trigger="load delay:1s"
+    hx-swap="outerHTML"
+>
+    <% if (status) { %>
+        Status: <%= status.toUpperCase() %>
+    <% } else { %>
+        Status: UNKNOWN
+    <% } %>
+</span>

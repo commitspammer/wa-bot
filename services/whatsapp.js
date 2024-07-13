@@ -5,21 +5,39 @@ const client = new Client({
     restartOnAuthFail: true,
 })
 
+var status = "DISCONNECTED"
+const getStatus = () => status.toUpperCase()
+client.once('ready', () => {
+    console.log('Ready!')
+    status = "CONNECTED"
+})
+client.once('authenticated', () => {
+    console.log('Authenticated!')
+    status = "CONNECTING"
+})
+client.once('auth_failure', () => {
+    console.log('Failed to authenticate!')
+    status = "UNAUTHENTICATED"
+})
+client.once('disconnected', () => {
+    console.log('Disconnected!')
+    status = "DISCONNECTED"
+})
+//client.on('change_state', s => {
+//    console.log(state)
+//    status = s
+//})
+
 const initialize = () => {
+    status = "INITIALIZING"
     client.initialize().then(() => console.log('Initialized!'))
 }
 
 var qr = null
 const getQR = () => qr
 client.on('qr', q => {
+    status = "DISCONNECTED"
     qr = q
-})
-
-var state = null
-const getState = () => state
-client.on('change_state', s => {
-    state = s
-    console.log(state)
 })
 
 var groups = null
@@ -31,8 +49,4 @@ const getGroups = async () => {
     return groups
 }
 
-client.once('ready', async () => {
-    console.log('Client is ready!')
-})
-
-module.exports = { initialize, getQR, getGroups }
+module.exports = { initialize, getQR, getStatus, getGroups }
