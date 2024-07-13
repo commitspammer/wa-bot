@@ -1,5 +1,5 @@
 <!doctype html>
-<div>
+<div class="p-2 bg-white">
     <div id="qrcode"></div>
     <script type="text/javascript">
         const qrcode = document.getElementById("qrcode");
@@ -8,6 +8,7 @@
                 text: "<%= qrvalue %>",
                 width: 256,
                 height: 256,
+                correctLevel : QRCode.CorrectLevel.H,
             });
         } catch {
             qrcode.innerHTML = "failed loading qrcode";
