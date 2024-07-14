@@ -23,10 +23,9 @@ client.once('disconnected', () => {
     console.log('Disconnected!')
     status = "DISCONNECTED"
 })
-//client.on('change_state', s => {
-//    console.log(state)
-//    status = s
-//})
+client.on('change_state', s => {
+    console.log(`New state: ${state}`)
+})
 
 const initialize = () => {
     status = "INITIALIZING"

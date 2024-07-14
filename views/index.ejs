@@ -15,11 +15,9 @@
         <%- include('load-qrcode.ejs') %>
         <main class="container p-4 mx-auto">
             <div class="space-y-2">
-                <%- include('message.ejs') %>
-                <%- include('message.ejs') %>
-                <%- include('message.ejs') %>
-                <%- include('message.ejs') %>
-                <%- include('message.ejs') %>
+                <% for (m of messages) { %>
+                    <%- include('message.ejs', { message: m }) %>
+                <% } %>
             </div>
         </main>
     </body>
