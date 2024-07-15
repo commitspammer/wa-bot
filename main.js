@@ -9,21 +9,26 @@ msg.load()
 const app = express()
 
 app.use(express.static('public'))
+app.set('port', process.env.PORT || '4807')
 app.set('view engine', 'ejs')
 app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+s))
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
 
-app.get('/', async (req, res) => {
+app.get('/favicon.ico', (req, res) => {
+    res.status(204)
+})
+
+app.get('/', (req, res) => {
     res.redirect('pages/client')
 })
 
-app.get('/pages/client', async (req, res) => {
-    res.render('pages/client', {})
+app.get('/pages/client', (req, res) => {
+    res.render('pages/client')
 })
 
-app.get('/pages/messages', async (req, res) => {
-    res.render('pages/messages', {})
+app.get('/pages/messages', (req, res) => {
+    res.render('pages/messages')
 })
 
 app.get('/qrcode', (req, res) => {
@@ -61,9 +66,8 @@ app.get('/chats/:id/icon', async (req, res, next) => {
     }
 })
 
-port = process.env.PORT || '4807'
-app.listen(port, () => {
-    console.log(`Express server running on http://localhost:${port}`)
+app.listen(app.get('port'), () => {
+    console.log(`Server running on http://localhost:${app.get('port')}`)
 })
 
 module.exports = app
