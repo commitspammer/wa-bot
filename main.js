@@ -48,9 +48,18 @@ app.get('/messages', async (req, res, next) => {
     }
 })
 
-//app.put('/messages/:id', (req, res) => {
-//    await msg.saveMessage()
-//})
+app.get('/chats/:id/icon', async (req, res, next) => {
+    try {
+        console.log('sus')
+        const id = req.params.id
+        const url = await wa.getChatPicUrl(id, {
+            fallback: 'http://localhost:4807/plainwhite.png'
+        })
+        res.render('comps/chat-icon', { src: url })
+    } catch (e) {
+        next(e)
+    }
+})
 
 port = process.env.PORT || '4807'
 app.listen(port, () => {

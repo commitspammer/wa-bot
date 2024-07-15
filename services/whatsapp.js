@@ -48,4 +48,15 @@ const getGroups = async () => {
     return groups
 }
 
-module.exports = { initialize, getQR, getStatus, getGroups }
+const getChatPicUrl = async (chatId, { fallback }) => {
+    try {
+        const chat = await chat.getChatById(chatId)
+        const contact = await chat.getContact()
+        const url = await contact.getProfilePicUrl()
+        return url
+    } catch {
+        return fallback || ''
+    }
+}
+
+module.exports = { initialize, getQR, getStatus, getGroups, getChatPicUrl }
