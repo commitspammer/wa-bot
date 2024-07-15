@@ -4,6 +4,15 @@
         "text": "asdfasdfasdfasdf",
         "media": "https://cataas.com/cat?width=100&height=100",
         "groups": [
+            "teste",
+            "test2"
+        ]
+    },
+    {
+        "id": "2",
+        "text": "apolgy for bad english<br>where were u wen club penguin die<br>i was at house eating dorito when phone ring<br>\"Club penguin is kil\"<br>\"no\"",
+        "media": "https://cataas.com/cat?width=100&height=100",
+        "groups": [
             "teste"
         ]
     }

@@ -1,21 +1,14 @@
 <!doctype html>
-<article id="<%= message.id %>" class="flex p-1 bg-emerald-900 rounded-xl">
-    <div class="flex-grow max-w-xs">
-        <img src="<%= message.media %>" class="rounded-xl w-full">
-    </div>
-    <p class="flex-1 px-4 py-2">
-        <%= message.text %>
-<!--
-        apolgy for bad english<br>
-        where were u wen club penguin die<br>
-        i was at house eating dorito when phone ring<br>
-        "Club penguin is kil"<br>
-        "no"
--->
-    </p>
-    <div class="w-64">
-        <div class="flex flex-row-reverse flex-wrap gap-2">
-            <img src="<%= message.media %>" class="rounded-full w-14 h-14">
+<article id="<%= message.id %>" class="bg-emerald-900 rounded-xl">
+    <div class="flex p-1">
+        <div class="w-32">
+            <img src="<%= message.media %>" class="rounded-xl w-full">
         </div>
+        <p class="flex-1 px-4 py-2">
+            <%- message.text %>
+        </p>
+    </div>
+    <div class="flex p-1 flex-wrap gap-2">
+        <img src="<%= message.media %>" class="rounded-full w-8 h-8">
     </div>
 </article>

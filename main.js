@@ -14,13 +14,6 @@ app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
 
-//const render = (res, path, params) => {
-//    for (let [k, v] of Object.entries(params)) {
-//        res.locals[k] = v
-//    }
-//    res.render('index', { page: path })
-//}
-
 app.get('/', async (req, res) => {
     res.redirect('pages/client')
 })
@@ -30,8 +23,7 @@ app.get('/pages/client', async (req, res) => {
 })
 
 app.get('/pages/messages', async (req, res) => {
-    const m = await msg.getMessages()
-    res.render('pages/messages', { messages: m })
+    res.render('pages/messages', {})
 })
 
 app.get('/qrcode', (req, res) => {
@@ -48,13 +40,13 @@ app.get('/status', (req, res) => {
     res.render('comps/status', { status: status })
 })
 
-//app.get('/messages', async (req, res, next) => {
-//    try {
-//        res.render('messages', { messages: await msg.getMessages() })
-//    } catch (e) {
-//        next(e)
-//    }
-//})
+app.get('/messages', async (req, res, next) => {
+    try {
+        res.render('comps/messages', { messages: await msg.getMessages() })
+    } catch (e) {
+        next(e)
+    }
+})
 
 //app.put('/messages/:id', (req, res) => {
 //    await msg.saveMessage()
