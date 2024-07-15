@@ -1,0 +1,16 @@
+<!doctype html>
+<nav class="p-4">
+    <ul class="flex justify-between">
+        <li>
+            <span class="bg-white rounded-full p-1">📞</span>
+        </li>
+        <li class="flex space-x-4">
+            <a href="/pages/client">Client</a>
+            <a href="/pages/messages">Messages</a>
+        </li>
+        <li>
+            <%- include('comps/status.ejs', { status: undefined }) %>
+        </li>
+    </ul>
+</nav>
+<hr>
