@@ -5,9 +5,9 @@
         <div class="w-32">
             <img src="<%= message.media %>" class="rounded-xl w-full">
         </div>
-        <div class="flex-1 px-4 py-2">
+        <div class="flex-1 flex px-4 py-2">
             <!-- yes, there has to be no identation inside textarea -->
-            <textarea name="text" rows="6" class="bg-emerald-950"><%= message.text %></textarea>
+            <textarea name="text" rows="6" class="flex-1 bg-emerald-950"><%= message.text %></textarea>
         </div>
         <div class="flex flex-col gap-2">
             <button class="p-1"
@@ -34,18 +34,9 @@
             </button>
         </div>
     </div>
-    <div class="flex p-1 flex-wrap gap-2">
-        <% for (gid of message.groupIds) { %>
-            <div hx-get="/chats/<%= gid %>/icon"
-                hx-trigger="load"
-                hx-swap="outerHTML"
-                hx-indicator="#icon-<%= gid %>-indicator"
-            >
-                <i id="icon-<%= gid %>-indicator"
-                    class="fa-spinner fa-solid animate-spin"
-                ></i>
-            </div>
-        <% } %>
-    </div>
+    <div hx-get="/groups/selector"
+        hx-trigger="load"
+        hx-swap="outerHTML"
+    ></div>
 </article>
 </form>

@@ -47,11 +47,21 @@ app.get('/status', (req, res) => {
     res.render('comps/status', { status: status })
 })
 
+app.get('/groups/selector', async (req, res, next) => {
+    try {
+        const selectedIds = req.query['selected']
+        const groups = await wa.getGroups()
+        res.render('comps/groups-selector', { groups, selectedIds })
+    } catch (e) {
+        next(e)
+    }
+})
+
 app.get('/chats/:id/icon', async (req, res, next) => {
     try {
         const id = req.params.id
         const url = await wa.getChatPicUrl(id, {
-            fallback: 'http://localhost:4807/plainwhite.png'
+            fallback: 'http://localhost:4807/failed-loading-image.png'
         })
         res.render('comps/chat-icon', { src: url })
     } catch (e) {

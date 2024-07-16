@@ -1,0 +1,20 @@
+<!doctype html>
+<div class="md:columns-2 p-1 space-y-2">
+    <% for (i in groups) { %>
+        <% const g = groups[i]; %>
+        <label class="flex items-center gap-1">
+            <input type="checkbox"
+                name="gid"
+                value="<%= g.id._serialized %>"
+            >
+            <div class="flex justify-center items-center w-8 h-8"
+                hx-get="/chats/<%= g.id._serialized %>/icon"
+                hx-trigger="load delay:<%= + i + 1 %>s"
+                hx-swap="outerHTML"
+            >
+                <i class="fa-spinner fa-solid animate-spin"></i>
+            </div>
+            <%= g.name %>
+        </label>
+    <% } %>
+</div>

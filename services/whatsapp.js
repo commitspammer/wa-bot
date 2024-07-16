@@ -41,20 +41,24 @@ client.on('qr', q => {
 
 var groups = null
 const getGroups = async () => {
-    if (groups == null) {
-        const chats = await client.getChats()
-        groups = chats.filter(gc => gc.isGroup)
+    try {
+        if (groups == null) {
+            const chats = await client.getChats()
+            groups = chats.filter(gc => gc.isGroup)
+        }
+        return groups
+    } catch (e) {
+        return null
     }
-    return groups
 }
 
 const getChatPicUrl = async (chatId, { fallback }) => {
     try {
-        const chat = await chat.getChatById(chatId)
+        const chat = await client.getChatById(chatId)
         const contact = await chat.getContact()
         const url = await contact.getProfilePicUrl()
         return url
-    } catch {
+    } catch (e) {
         return fallback || ''
     }
 }

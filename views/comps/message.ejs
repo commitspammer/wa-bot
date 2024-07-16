@@ -19,14 +19,12 @@
     </div>
     <div class="flex p-1 flex-wrap gap-2">
         <% for (gid of message.groupIds) { %>
-            <div hx-get="/chats/<%= gid %>/icon"
+            <div class="flex justify-center items-center w-8 h-8"
+                hx-get="/chats/<%= gid %>/icon"
                 hx-trigger="load"
                 hx-swap="outerHTML"
-                hx-indicator="#icon-<%= gid %>-indicator"
             >
-                <i id="icon-<%= gid %>-indicator"
-                    class="fa-spinner fa-solid animate-spin"
-                ></i>
+                <i class="fa-spinner fa-solid animate-spin"></i>
             </div>
         <% } %>
     </div>
