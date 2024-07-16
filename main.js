@@ -59,6 +59,15 @@ app.get('/chats/:id/icon', async (req, res, next) => {
     }
 })
 
+app.post('/messages', async (req, res, next) => {
+    try {
+        await msg.createEmptyMessage()
+        res.render('comps/messages', { messages: await msg.getMessages() })
+    } catch (e) {
+        next(e)
+    }
+})
+
 app.get('/messages', async (req, res, next) => {
     try {
         res.render('comps/messages', { messages: await msg.getMessages() })
@@ -90,8 +99,18 @@ app.put('/messages/:id', async (req, res, next) => {
         const id = req.params.id
         const m = await msg.getMessage(id)
         m.text = req.body.text
-        await msg.saveMessage(m)
+        await msg.updateMessage(m)
         res.render('comps/message', { message: m })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.delete('/messages/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        await msg.deleteMessage(id)
+        res.send('')
     } catch (e) {
         next(e)
     }

@@ -13,10 +13,22 @@
     <body class="bg-emerald-950 text-white">
         <%- include('comps/navbar.ejs') %>
         <main class="container p-4 mx-auto">
-            <div id="messages-indicator" class="flex justify-center htmx-indicator">
-                <i class="fa-spinner fa-solid animate-spin"></i>
+            <div class="flex">
+                <div id="messages-indicator" class="indicator">
+                    <i class="fa-spinner fa-solid fa-xl animate-spin"></i>
+                </div>
+                <div class="flex-1 flex flex-row-reverse">
+                    <button class="p-1"
+                        hx-post="/messages"
+                        hx-target="#messages"
+                        hx-swap="innerHTML"
+                    >
+                        <i class="fa-square-plus fa-solid fa-xl"></i>
+                    </button>
+                </div>
             </div>
-            <div hx-get="/messages"
+            <div id="messages"
+                hx-get="/messages"
                 hx-trigger="load"
                 hx-swap="innerHTML"
                 hx-indicator="#messages-indicator"
@@ -26,4 +38,16 @@
     </body>
     <script>
     </script>
+    <style>
+        .indicator {
+            display:none;
+        }
+        .htmx-request.indicator {
+            display:block;
+        }
+        .htmx-request .indicator {
+            display:block;
+        }
+    }
+    </style>
 </html>
