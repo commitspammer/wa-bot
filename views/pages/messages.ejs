@@ -13,16 +13,14 @@
     <body class="bg-emerald-950 text-white">
         <%- include('comps/navbar.ejs') %>
         <main class="container p-4 mx-auto">
+            <div id="messages-indicator" class="flex justify-center htmx-indicator">
+                <i class="fa-spinner fa-solid animate-spin"></i>
+            </div>
             <div hx-get="/messages"
                 hx-trigger="load"
                 hx-swap="innerHTML"
                 hx-indicator="#messages-indicator"
             >
-                <div class="flex justify-center">
-                    <i id="messages-indicator"
-                        class="fa-spinner fa-solid animate-spin"
-                    ></i>
-                </div>
             </div>
         </main>
     </body>

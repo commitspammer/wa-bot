@@ -9,6 +9,8 @@ msg.load()
 const app = express()
 
 app.use(express.static('public'))
+app.use(express.json({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 app.set('port', process.env.PORT || '4807')
 app.set('view engine', 'ejs')
 app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+s))
@@ -45,6 +47,18 @@ app.get('/status', (req, res) => {
     res.render('comps/status', { status: status })
 })
 
+app.get('/chats/:id/icon', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const url = await wa.getChatPicUrl(id, {
+            fallback: 'http://localhost:4807/plainwhite.png'
+        })
+        res.render('comps/chat-icon', { src: url })
+    } catch (e) {
+        next(e)
+    }
+})
+
 app.get('/messages', async (req, res, next) => {
     try {
         res.render('comps/messages', { messages: await msg.getMessages() })
@@ -53,14 +67,31 @@ app.get('/messages', async (req, res, next) => {
     }
 })
 
-app.get('/chats/:id/icon', async (req, res, next) => {
+app.get('/messages/:id', async (req, res, next) => {
     try {
-        console.log('sus')
         const id = req.params.id
-        const url = await wa.getChatPicUrl(id, {
-            fallback: 'http://localhost:4807/plainwhite.png'
-        })
-        res.render('comps/chat-icon', { src: url })
+        res.render('comps/message', { message: await msg.getMessage(id) })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.get('/messages/:id/edit', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        res.render('comps/edit-message', { message: await msg.getMessage(id) })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.put('/messages/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const m = await msg.getMessage(id)
+        m.text = req.body.text
+        await msg.saveMessage(m)
+        res.render('comps/message', { message: m })
     } catch (e) {
         next(e)
     }

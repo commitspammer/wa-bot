@@ -1,3 +1,6 @@
 {
-    "ext": "json,js,html,ejs"
+    "ext": "json,js,html,ejs",
+    "ignore": [
+        "./save.json"
+    ]
 }

@@ -1,12 +1,21 @@
 <!doctype html>
-<article id="<%= message.id %>" class="bg-emerald-900 rounded-xl">
+<article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
     <div class="flex p-1">
         <div class="w-32">
             <img src="<%= message.media %>" class="rounded-xl w-full">
         </div>
         <p class="flex-1 px-4 py-2">
-            <%- message.text %>
+            <%- message.text.replaceAll("\n", "<br>") %>
         </p>
+        <div>
+            <button class="p-1"
+                hx-get="/messages/<%= message.id %>/edit"
+                hx-target="#message-<%= message.id %>"
+                hx-swap="outerHTML"
+            >
+                <i class="fa-pencil fa-solid"></i>
+            </button>
+        </div>
     </div>
     <div class="flex p-1 flex-wrap gap-2">
         <% for (gid of message.groupIds) { %>

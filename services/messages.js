@@ -18,16 +18,26 @@ function MessagesService() {
         if (cache.messages === undefined) {
             await load()
         }
-        return cache.messages
+        //return cache.messages //no cache being used for now
+        const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
+        return messages
+    }
+
+    this.getMessage = async (id) => {
+        const messages = await this.getMessages()
+        const msg = messages.find(m => m.id == id)
+        if (msg === null) throw 'not found'
+        return msg
     }
 
     this.saveMessage = async (m) => {
         const messages = await this.getMessages()
         for (i in messages) {
             if (messages[i].id === m.id) {
-                messages[i] = m
+                messages[i].text = m.text
             }
         }
+        await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
     }
 }
 
