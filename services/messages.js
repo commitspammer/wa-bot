@@ -9,6 +9,7 @@ function MessagesService() {
     }
 
     this.load = async () => {
+        //TODO handle 'file not found' and 'empty file'
         const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
         //const messages = JSON.parse(fs.readFileSync(SAVE_FILE_PATH))
         console.log(messages)
@@ -37,6 +38,7 @@ function MessagesService() {
             if (messages[i].id === m.id) {
                 messages[i].text = m.text
                 messages[i].groupIds = m.groupIds
+                messages[i].media = m.media
                 break
             }
         }

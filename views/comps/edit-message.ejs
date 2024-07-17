@@ -1,30 +1,46 @@
 <!doctype html>
-<form>
+<form hx-encoding="multipart/form-data"
+    hx-put="/messages/<%= message.id %>"
+    hx-target="#message-<%= message.id %>"
+    hx-swap="outerHTML"
+    hx-disinherit="*"
+>
+<!-- disable the damned inheritance -->
 <article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
     <div class="flex p-1">
-        <div class="w-32">
-            <img src="<%= message.media %>" class="rounded-xl w-full">
+        <div class="w-32 relative">
+            <img id="media-img-<%= message.id %>" src="<%= message.media %>" class="rounded-xl w-full">
+            <div class="absolute inset-0 flex justify-center items-center">
+                <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
+                    <i class="fa-upload fa-solid fa-xl"></i>
+                </div>
+            </div>
+            <input type="file"
+                id="media-input-<%= message.id %>"
+                name="media"
+                accept="image/*,video/*"
+                class="absolute inset-0 opacity-0"
+            >
         </div>
         <div class="flex-1 flex px-4 py-2">
             <!-- yes, there has to be no identation inside textarea -->
             <textarea name="text" rows="6" class="flex-1 bg-emerald-950"><%= message.text %></textarea>
         </div>
         <div class="flex flex-col gap-2">
+            <!-- type button is needed cuz buttons are submit by default -->
             <button class="p-1"
+                type="button"
                 hx-get="/messages/<%= message.id %>"
                 hx-target="#message-<%= message.id %>"
                 hx-swap="outerHTML"
             >
                 <i class="fa-delete-left fa-solid"></i>
             </button>
-            <button class="p-1"
-                hx-put="/messages/<%= message.id %>"
-                hx-target="#message-<%= message.id %>"
-                hx-swap="outerHTML"
-            >
+            <button type="submit" class="p-1">
                 <i class="fa-floppy-disk fa-solid"></i>
             </button>
             <button class="p-1"
+                type="button"
                 hx-delete="/messages/<%= message.id %>"
                 hx-target="#message-<%= message.id %>"
                 hx-swap="outerHTML"
@@ -38,5 +54,14 @@
         hx-trigger="load"
         hx-swap="outerHTML"
     ></div>
+    <script>
+        var mediaInput = document.getElementById('media-input-<%= message.id %>');
+        var mediaImg = document.getElementById('media-img-<%= message.id %>');
+        mediaInput.addEventListener('change', e => {
+            if (e?.target?.files && e?.target?.files[0]) {
+                mediaImg.src = URL.createObjectURL(event.target.files[0]);
+            }
+        });
+    </script>
 </article>
 </form>

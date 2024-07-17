@@ -13,13 +13,12 @@
     <body class="bg-emerald-950 text-white">
         <%- include('comps/navbar.ejs') %>
         <main class="container p-4 mx-auto">
-            <div class="flex">
+            <div class="flex p-1">
                 <div id="messages-indicator" class="indicator">
                     <i class="fa-spinner fa-solid fa-xl animate-spin"></i>
                 </div>
                 <div class="flex-1 flex flex-row-reverse">
-                    <button class="p-1"
-                        hx-post="/messages"
+                    <button hx-post="/messages"
                         hx-target="#messages"
                         hx-swap="innerHTML"
                     >

@@ -1,4 +1,5 @@
 const express = require('express')
+const multer = require('multer')
 const wa = require('./services/whatsapp.js')
 const { MessagesService } = require('./services/messages.js')
 
@@ -7,6 +8,16 @@ const msg = new MessagesService()
 msg.load()
 
 const app = express()
+const upload = multer({ storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, __dirname + '/public/')
+    },
+    filename: function (req, file, cb) {
+        console.log(file.mimetype)
+        const ext = file.originalname.split('.').slice(1).pop()
+        cb(null, Date.now() + (ext ? '.' + ext : ''))
+    }
+})})
 
 app.use(express.static('public'))
 app.use(express.json({ extended: true }))
@@ -108,12 +119,13 @@ app.get('/messages/:id/edit', async (req, res, next) => {
     }
 })
 
-app.put('/messages/:id', async (req, res, next) => {
+app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
     try {
         const id = req.params.id
         const m = await msg.getMessage(id)
-        m.text = req.body.text
+        m.text = req.body.text || ''
         m.groupIds = parseQueryList(req.body.gid)
+        m.media = req.file ? `/${req.file.filename}` : m.media
         await msg.updateMessage(m)
         res.render('comps/message', { message: m })
     } catch (e) {
