@@ -6,6 +6,9 @@
             <input type="checkbox"
                 name="gid"
                 value="<%= g.id._serialized %>"
+                <% if (checkedIds.includes(g.id._serialized)) { %>
+                    checked
+                <% } %>
             >
             <div class="flex justify-center items-center w-8 h-8"
                 hx-get="/chats/<%= g.id._serialized %>/icon"

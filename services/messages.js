@@ -36,6 +36,8 @@ function MessagesService() {
         for (i in messages) {
             if (messages[i].id === m.id) {
                 messages[i].text = m.text
+                messages[i].groupIds = m.groupIds
+                break
             }
         }
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))

@@ -49,9 +49,9 @@ app.get('/status', (req, res) => {
 
 app.get('/groups/selector', async (req, res, next) => {
     try {
-        const selectedIds = req.query['selected']
+        const checkedIds = [ req.query.checked ].flatMap(x => x)
         const groups = await wa.getGroups()
-        res.render('comps/groups-selector', { groups, selectedIds })
+        res.render('comps/groups-selector', { groups, checkedIds })
     } catch (e) {
         next(e)
     }
@@ -109,6 +109,7 @@ app.put('/messages/:id', async (req, res, next) => {
         const id = req.params.id
         const m = await msg.getMessage(id)
         m.text = req.body.text
+        m.groupIds = [ req.body.gid ].flatMap(x => x)
         await msg.updateMessage(m)
         res.render('comps/message', { message: m })
     } catch (e) {

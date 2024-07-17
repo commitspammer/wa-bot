@@ -34,7 +34,7 @@
             </button>
         </div>
     </div>
-    <div hx-get="/groups/selector"
+    <div hx-get="/groups/selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '')%>"
         hx-trigger="load"
         hx-swap="outerHTML"
     ></div>
