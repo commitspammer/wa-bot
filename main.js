@@ -17,6 +17,10 @@ app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
 
+function parseQueryList(q) {
+    return [ q ].flatMap(x => x).filter(x => typeof x === 'string')
+}
+
 app.get('/favicon.ico', (req, res) => {
     res.status(204)
 })
@@ -49,7 +53,7 @@ app.get('/status', (req, res) => {
 
 app.get('/groups/selector', async (req, res, next) => {
     try {
-        const checkedIds = [ req.query.checked ].flatMap(x => x)
+        const checkedIds = parseQueryList(req.query.checked)
         const groups = await wa.getGroups()
         res.render('comps/groups-selector', { groups, checkedIds })
     } catch (e) {
@@ -109,7 +113,7 @@ app.put('/messages/:id', async (req, res, next) => {
         const id = req.params.id
         const m = await msg.getMessage(id)
         m.text = req.body.text
-        m.groupIds = [ req.body.gid ].flatMap(x => x)
+        m.groupIds = parseQueryList(req.body.gid)
         await msg.updateMessage(m)
         res.render('comps/message', { message: m })
     } catch (e) {
