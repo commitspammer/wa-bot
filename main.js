@@ -125,6 +125,8 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
         m.text = req.body.text || ''
         m.groupIds = parseQueryList(req.body.gid)
         m.media = req.file ? `/${req.file.filename}` : m.media
+        if (req.body.deletemedia === 'true') m.media = null
+        console.log(req.body.deletemedia)
         m.waitInterval = '20000'
         m.sendInterval = '4000'
         m = await msg.updateMessage(m)

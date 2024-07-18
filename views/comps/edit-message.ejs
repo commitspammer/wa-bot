@@ -10,17 +10,28 @@
     <div class="flex p-1">
         <div class="w-32 relative">
             <img id="media-img-<%= message.id %>" src="<%= message.media %>" class="rounded-xl w-full">
-            <div class="absolute inset-0 flex justify-center items-center">
+            <div class="absolute top-0 right-0">
                 <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
                     <i class="fa-upload fa-solid fa-xl"></i>
+                </div>
+            </div>
+            <div class="absolute top-0 left-0">
+                <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
+                    <i class="fa-trash fa-solid fa-xl"></i>
                 </div>
             </div>
             <input type="file"
                 id="media-input-<%= message.id %>"
                 name="media"
                 accept="image/*,video/*"
-                class="absolute inset-0 opacity-0"
+                class="absolute inset-y-0 inset-x-1/2 right-0 opacity-0 cursor-pointer"
             >
+            <input type="text"
+                id="media-delete-<%= message.id %>"
+                name="deletemedia"
+                value="false"
+                class="absolute inset-y-0 inset-x-1/2 left-0 opacity-0 cursor-pointer"
+            ></input>
         </div>
         <div class="flex-1 flex px-4 py-2">
             <!-- yes, there has to be no identation inside textarea -->
@@ -57,9 +68,18 @@
     <script>
         var mediaInput = document.getElementById('media-input-<%= message.id %>');
         var mediaImg = document.getElementById('media-img-<%= message.id %>');
+        var mediaDelete = document.getElementById('media-delete-<%= message.id %>');
         mediaInput.addEventListener('change', e => {
             if (e?.target?.files && e?.target?.files[0]) {
                 mediaImg.src = URL.createObjectURL(event.target.files[0]);
+                mediaDelete.value = 'false';
+            }
+        });
+        mediaDelete.addEventListener('click', e => {
+            if (confirm('Are you sure you wish to remove the image?')) {
+                mediaImg.src = '';
+                mediaInput.value = '';
+                mediaDelete.value = 'true';
             }
         });
     </script>
