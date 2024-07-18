@@ -121,13 +121,13 @@ app.get('/messages/:id/edit', async (req, res, next) => {
 app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
     try {
         const id = req.params.id
-        const m = await msg.getMessage(id)
+        let m = await msg.getMessage(id)
         m.text = req.body.text || ''
         m.groupIds = parseQueryList(req.body.gid)
         m.media = req.file ? `/${req.file.filename}` : m.media
         m.waitInterval = '20000'
         m.sendInterval = '4000'
-        await msg.updateMessage(m)
+        m = await msg.updateMessage(m)
         res.render('comps/message', { message: m })
     } catch (e) {
         next(e)
@@ -137,8 +137,8 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
 app.put('/messages/:id/start', async (req, res, next) => {
     try {
         const id = req.params.id
-        const m = await msg.getMessage(id)
-        await msg.startMessage(m, (gid, text, media) => {
+        let m = await msg.getMessage(id)
+        m = await msg.startMessage(m, (gid, text, media) => {
             let md = media
             if (media && media[0] === '/') {
                 md = `http://localhost:${app.get('port')}${media}`
@@ -146,7 +146,18 @@ app.put('/messages/:id/start', async (req, res, next) => {
             console.log(gid, text, md)
             wa.sendMessage(gid, text, md).catch(console.log)
         })
-        res.status(204).send()
+        res.render('comps/message', { message: m })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.put('/messages/:id/stop', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        let m = await msg.getMessage(id)
+        m = await msg.stopMessage(m)
+        res.render('comps/message', { message: m })
     } catch (e) {
         next(e)
     }

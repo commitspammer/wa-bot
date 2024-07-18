@@ -45,13 +45,14 @@ function MessagesService() {
                 messages[i].media = m.media
                 messages[i].waitInterval = m.waitInterval
                 messages[i].sendInterval = m.sendInterval
-                break
+                await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
+                return await this.getMessage(m.id)
             }
         }
-        await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
     }
 
     this.startMessage = async (m, send) => {
+        //TODO i might as well call getMessage(id)
         const messages = await this.getMessages()
         for (i in messages) {
             if (messages[i].id !== m.id) {
@@ -72,7 +73,7 @@ function MessagesService() {
                     this.startMessage(msg, send)
                 }, msg.sendInterval))
             }, msg.waitInterval))
-            break
+            return await this.getMessage(m.id)
         }
     }
 
@@ -80,6 +81,7 @@ function MessagesService() {
         CACHE.timeouts[m.id]?.forEach(t => clearTimeout(t))
         CACHE.timeouts[m.id] = []
         CACHE.statuses[m.id] = Status.stopped
+        return await this.getMessage(m.id)
     }
 
     this.createEmptyMessage = async () => {
@@ -92,6 +94,7 @@ function MessagesService() {
         const messages = await this.getMessages()
         messages.push(msg)
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
+        return await this.getMessage(msg.id)
     }
 
     this.deleteMessage = async (id) => {
