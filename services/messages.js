@@ -1,27 +1,31 @@
 const fs = require('fs').promises
 const { genUUID } = require('../lib/uuid.js')
 
+const Status = {
+    stopped: 'STOPPED',
+    waiting: 'WAITING',
+    sending: 'SENDING',
+}
+
 function MessagesService() {
     const SAVE_FILE_PATH = './save.json'
-
-    const cache = {
-        messages: undefined
-    }
-
-    this.load = async () => {
-        //TODO handle 'file not found' and 'empty file'
-        const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
-        //const messages = JSON.parse(fs.readFileSync(SAVE_FILE_PATH))
-        console.log(messages)
-        cache.messages = messages
+    const CACHE = {
+        timeouts: {},
+        statuses: {},
     }
 
     this.getMessages = async () => {
-        if (cache.messages === undefined) {
-            await load()
-        }
-        //return cache.messages //no cache being used for now
+        //TODO handle 'file not found' and 'empty file'
         const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
+        for (i in messages) {
+            if (CACHE.statuses[messages[i].id] === undefined) {
+                CACHE.statuses[messages[i].id] = Status.stopped
+            }
+            if (CACHE.timeouts[messages[i].id] === undefined) {
+                CACHE.timeouts[messages[i].id] = []
+            }
+            messages[i].status = CACHE.statuses[messages[i].id]
+        }
         return messages
     }
 
@@ -50,22 +54,32 @@ function MessagesService() {
     this.startMessage = async (m, send) => {
         const messages = await this.getMessages()
         for (i in messages) {
-            if (messages[i].id === m.id) {
-                const msg = messages[i]
-                const w = setTimeout(() => {
-                    const step = msg.sendInterval / msg.groupIds.length
-                    for (j in msg.groupIds) {
-                        const gid = msg.groupIds[j]
-                        const s = setTimeout(() => {
-                            send(gid, msg.text, msg.media)
-                        }, step * j)
-                        console.log(m.id + ': ' + s)
-                    }
-                }, msg.waitInterval)
-                console.log(m.id + ': ' + w)
-                break
+            if (messages[i].id !== m.id) {
+                continue
             }
+            const msg = messages[i]
+            CACHE.statuses[msg.id] = Status.waiting
+            CACHE.timeouts[msg.id].push(setTimeout(() => {
+                const step = msg.sendInterval / msg.groupIds.length
+                for (j in msg.groupIds) {
+                    const gid = msg.groupIds[j]
+                    CACHE.timeouts[msg.id].push(setTimeout(() => {
+                        send(gid, msg.text, msg.media)
+                    }, step * j))
+                }
+                CACHE.statuses[msg.id] = Status.sending
+                CACHE.timeouts[msg.id].push(setTimeout(() => {
+                    this.startMessage(msg, send)
+                }, msg.sendInterval))
+            }, msg.waitInterval))
+            break
         }
+    }
+
+    this.stopMessage = async (m) => {
+        CACHE.timeouts[m.id]?.forEach(t => clearTimeout(t))
+        CACHE.timeouts[m.id] = []
+        CACHE.statuses[m.id] = Status.stopped
     }
 
     this.createEmptyMessage = async () => {
@@ -87,4 +101,4 @@ function MessagesService() {
     }
 }
 
-module.exports = { MessagesService }
+module.exports = { MessagesService, Status }

@@ -65,8 +65,17 @@ const getChatPicUrl = async (chatId, { fallback }) => {
 
 const sendMessage = async (chatId, content, mediaUrl) => {
     const chat = await client.getChatById(chatId)
-    const media = await MessageMedia.fromUrl(mediaUrl, { unsafeMime: true })
-    chat.sendMessage(content, { media: media })
+    if (mediaUrl && content) {
+        const media = await MessageMedia.fromUrl(mediaUrl, { unsafeMime: true })
+        chat.sendMessage(content, { media: media })
+    } else if (content) {
+        chat.sendMessage(content)
+    } else if (mediaUrl) {
+        const media = await MessageMedia.fromUrl(mediaUrl, { unsafeMime: true })
+        chat.sendMessage(media)
+    } else {
+        throw 'missing content and media url'
+    }
 }
 
 module.exports = { initialize, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }

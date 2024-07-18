@@ -5,7 +5,6 @@ const { MessagesService } = require('./services/messages.js')
 
 wa.initialize()
 const msg = new MessagesService()
-msg.load()
 
 const app = express()
 const upload = multer({ storage: multer.diskStorage({
@@ -141,9 +140,10 @@ app.put('/messages/:id/start', async (req, res, next) => {
         const m = await msg.getMessage(id)
         await msg.startMessage(m, (gid, text, media) => {
             let md = media
-            if (media[0] === '/') {
+            if (media && media[0] === '/') {
                 md = `http://localhost:${app.get('port')}${media}`
             }
+            console.log(gid, text, md)
             wa.sendMessage(gid, text, md).catch(console.log)
         })
         res.status(204).send()
