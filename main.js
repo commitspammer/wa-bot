@@ -12,7 +12,6 @@ const upload = multer({ storage: multer.diskStorage({
         cb(null, __dirname + '/public/')
     },
     filename: function (req, file, cb) {
-        console.log(file.mimetype)
         const ext = file.originalname.split('.').slice(1).pop()
         cb(null, Date.now() + (ext ? '.' + ext : ''))
     }
@@ -126,7 +125,6 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
         m.groupIds = parseQueryList(req.body.gid)
         m.media = req.file ? `/${req.file.filename}` : m.media
         if (req.body.deletemedia === 'true') m.media = null
-        console.log(req.body.deletemedia)
         m.waitInterval = '20000'
         m.sendInterval = '4000'
         m = await msg.updateMessage(m)
