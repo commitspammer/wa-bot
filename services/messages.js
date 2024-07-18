@@ -39,10 +39,33 @@ function MessagesService() {
                 messages[i].text = m.text
                 messages[i].groupIds = m.groupIds
                 messages[i].media = m.media
+                messages[i].waitInterval = m.waitInterval
+                messages[i].sendInterval = m.sendInterval
                 break
             }
         }
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
+    }
+
+    this.startMessage = async (m, send) => {
+        const messages = await this.getMessages()
+        for (i in messages) {
+            if (messages[i].id === m.id) {
+                const msg = messages[i]
+                const w = setTimeout(() => {
+                    const step = msg.sendInterval / msg.groupIds.length
+                    for (j in msg.groupIds) {
+                        const gid = msg.groupIds[j]
+                        const s = setTimeout(() => {
+                            send(gid, msg.text, msg.media)
+                        }, step * j)
+                        console.log(m.id + ': ' + s)
+                    }
+                }, msg.waitInterval)
+                console.log(m.id + ': ' + w)
+                break
+            }
+        }
     }
 
     this.createEmptyMessage = async () => {

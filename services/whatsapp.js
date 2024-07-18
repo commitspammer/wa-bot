@@ -1,4 +1,4 @@
-const { Client, LocalAuth } = require('whatsapp-web.js')
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -63,4 +63,10 @@ const getChatPicUrl = async (chatId, { fallback }) => {
     }
 }
 
-module.exports = { initialize, getQR, getStatus, getGroups, getChatPicUrl }
+const sendMessage = async (chatId, content, mediaUrl) => {
+    const chat = await client.getChatById(chatId)
+    const media = await MessageMedia.fromUrl(mediaUrl, { unsafeMime: true })
+    chat.sendMessage(content, { media: media })
+}
+
+module.exports = { initialize, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }

@@ -33,7 +33,7 @@ function parseQueryList(q) {
 }
 
 app.get('/favicon.ico', (req, res) => {
-    res.status(204)
+    res.status(204).send()
 })
 
 app.get('/', (req, res) => {
@@ -126,8 +126,27 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
         m.text = req.body.text || ''
         m.groupIds = parseQueryList(req.body.gid)
         m.media = req.file ? `/${req.file.filename}` : m.media
+        m.waitInterval = '20000'
+        m.sendInterval = '4000'
         await msg.updateMessage(m)
         res.render('comps/message', { message: m })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.put('/messages/:id/start', async (req, res, next) => {
+    try {
+        const id = req.params.id
+        const m = await msg.getMessage(id)
+        await msg.startMessage(m, (gid, text, media) => {
+            let md = media
+            if (media[0] === '/') {
+                md = `http://localhost:${app.get('port')}${media}`
+            }
+            wa.sendMessage(gid, text, md).catch(console.log)
+        })
+        res.status(204).send()
     } catch (e) {
         next(e)
     }
