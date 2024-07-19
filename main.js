@@ -134,7 +134,7 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
     }
 })
 
-app.put('/messages/:id/start', async (req, res, next) => {
+app.post('/messages/:id/send/start', async (req, res, next) => {
     try {
         const id = req.params.id
         let m = await msg.getMessage(id)
@@ -152,12 +152,45 @@ app.put('/messages/:id/start', async (req, res, next) => {
     }
 })
 
-app.put('/messages/:id/stop', async (req, res, next) => {
+app.post('/messages/:id/send/stop', async (req, res, next) => {
     try {
         const id = req.params.id
         let m = await msg.getMessage(id)
         m = await msg.stopMessage(m)
         res.render('comps/message', { message: m })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.post('/messages/send/start', async (req, res, next) => {
+    try {
+        const messages = await msg.getMessages()
+        for (i in messages) {
+            const m = messages[i]
+            await msg.startMessage(m, (gid, text, media) => {
+                let md = media
+                if (media && media[0] === '/') {
+                    md = `http://localhost:${app.get('port')}${media}`
+                }
+                console.log(gid, text, md)
+                wa.sendMessage(gid, text, md).catch(console.log)
+            })
+        }
+        res.render('comps/messages', { messages: await msg.getMessages() })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.post('/messages/send/stop', async (req, res, next) => {
+    try {
+        const messages = await msg.getMessages()
+        for (i in messages) {
+            const m = messages[i]
+            await msg.stopMessage(m)
+        }
+        res.render('comps/messages', { messages: await msg.getMessages() })
     } catch (e) {
         next(e)
     }

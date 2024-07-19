@@ -32,7 +32,7 @@ function MessagesService() {
     this.getMessage = async (id) => {
         const messages = await this.getMessages()
         const msg = messages.find(m => m.id === id)
-        if (msg === null) throw 'not found'
+        if (!msg) throw 'message not found'
         return msg
     }
 
@@ -45,6 +45,8 @@ function MessagesService() {
                 messages[i].media = m.media
                 messages[i].waitInterval = m.waitInterval
                 messages[i].sendInterval = m.sendInterval
+                messages[i].status = undefined
+                messages[i].timeouts = undefined
                 await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
                 return await this.getMessage(m.id)
             }
@@ -56,6 +58,9 @@ function MessagesService() {
         const messages = await this.getMessages()
         for (i in messages) {
             if (messages[i].id !== m.id) {
+                continue
+            }
+            if (messages[i].status !== Status.stopped) {
                 continue
             }
             const msg = messages[i]

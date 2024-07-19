@@ -1,9 +1,9 @@
 <!doctype html>
 <div class="space-y-2">
     <% if (messages.length === 0) { %>
-        <span>
-            There are no messages
-        </span>
+        <div class="text-center">
+            There are no messages. Click [+] to create one.
+        </div>
     <% } else { %>
         <% for (m of messages.reverse()) { %>
             <%- include('comps/message.ejs', { message: m }) %>

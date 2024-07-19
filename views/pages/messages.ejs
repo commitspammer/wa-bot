@@ -14,10 +14,28 @@
         <%- include('comps/navbar.ejs') %>
         <main class="container p-4 mx-auto">
             <div class="flex p-1">
-                <div id="messages-indicator" class="indicator">
-                    <i class="fa-spinner fa-solid fa-xl animate-spin"></i>
+                <div class="flex-1">
+                    <div id="messages-indicator" class="indicator">
+                        <i class="fa-spinner fa-solid fa-xl animate-spin"></i>
+                    </div>
                 </div>
-                <div class="flex-1 flex flex-row-reverse">
+                <div class="flex gap-2">
+                    <button hx-post="/messages/send/start"
+                        hx-target="#messages"
+                        hx-swap="innerHTML"
+                        hx-confirm="Are you sure you want to START all messsages?"
+                    >
+                        <i class="fa-circle-play fa-solid fa-lg"></i>
+                    </button>
+                    <button hx-post="/messages/send/stop"
+                        hx-target="#messages"
+                        hx-swap="innerHTML"
+                        hx-confirm="Are you sure you want to STOP all messsages?"
+                    >
+                        <i class="fa-circle-stop fa-regular fa-lg"></i>
+                    </button>
+                </div>
+                <div class="flex-1 flex flex-row-reverse gap-2">
                     <button hx-post="/messages"
                         hx-target="#messages"
                         hx-swap="innerHTML"

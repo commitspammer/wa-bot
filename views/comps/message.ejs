@@ -17,7 +17,7 @@
             </button>
             <% if (message.status === 'STOPPED') { %>
                 <button class="p-1"
-                    hx-put="/messages/<%= message.id %>/start"
+                    hx-post="/messages/<%= message.id %>/send/start"
                     hx-target="#message-<%= message.id %>"
                     hx-swap="outerHTML"
                 >
@@ -25,7 +25,7 @@
                 </button>
             <% } else { %>
                 <button class="p-1"
-                    hx-put="/messages/<%= message.id %>/stop"
+                    hx-post="/messages/<%= message.id %>/send/stop"
                     hx-target="#message-<%= message.id %>"
                     hx-swap="outerHTML"
                 >
