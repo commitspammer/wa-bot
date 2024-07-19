@@ -26,9 +26,28 @@ app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
 
-function parseQueryList(q) {
+app.locals.parseQueryList = (q) => {
     return [ q ].flatMap(x => x).filter(x => typeof x === 'string')
 }
+app.locals.parseIntervalToMs = (v, u) => {
+    let c = u.charAt(0).toLowerCase()
+    return c == "d" ? v * 1000 * 60 * 60 * 24 : c == "h" ? v * 1000 * 60 * 60
+        : c == "m" ? v * 1000 * 60 : c == "s" ? v * 1000 : 0
+}
+app.locals.parseIntervalToStr = (ms) => {
+    return ms % (1000 * 60 * 60 * 24) === 0 ? `${ms / (1000 * 60 * 60 * 24)}d`
+        : ms % (1000 * 60 * 60) === 0 ? `${ms / (1000 * 60 * 60)}h`
+        : ms % (1000 * 60) === 0 ? `${ms / (1000 * 60)}m`
+        : ms % (1000) === 0 ? `${ms / (1000)}s` : `${ms}ms`
+}
+app.locals.parseIntervalToValueUnit = (ms) => {
+    return ms % (1000 * 60 * 60 * 24) === 0 ? [ms / (1000 * 60 * 60 * 24), 's']
+        : ms % (1000 * 60 * 60) === 0 ? [ms / (1000 * 60 * 60), 'h']
+        : ms % (1000 * 60) === 0 ? [ms / (1000 * 60), 'm']
+        : ms % (1000) === 0 ? [ms / (1000), 's'] : [ms, 'ms']
+}
+
+app.locals
 
 app.get('/favicon.ico', (req, res) => {
     res.status(204).send()
@@ -60,9 +79,9 @@ app.get('/status', (req, res) => {
     res.render('comps/status', { status: status })
 })
 
-app.get('/groups/selector', async (req, res, next) => {
+app.get('/groups-selector', async (req, res, next) => {
     try {
-        const checkedIds = parseQueryList(req.query.checked)
+        const checkedIds = app.locals.parseQueryList(req.query.checked)
         const groups = await wa.getGroups()
         res.render('comps/groups-selector', { groups, checkedIds })
     } catch (e) {
@@ -122,11 +141,11 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
         const id = req.params.id
         let m = await msg.getMessage(id)
         m.text = req.body.text || ''
-        m.groupIds = parseQueryList(req.body.gid)
+        m.groupIds = app.locals.parseQueryList(req.body.gid)
         m.media = req.file ? `/${req.file.filename}` : m.media
         if (req.body.deletemedia === 'true') m.media = null
-        m.waitInterval = '20000'
-        m.sendInterval = '4000'
+        m.waitInterval = app.locals.parseIntervalToMs(req.body.waitValue, req.body.waitUnit)
+        m.sendInterval = app.locals.parseIntervalToMs(req.body.sendValue, req.body.sendUnit)
         m = await msg.updateMessage(m)
         res.render('comps/message', { message: m })
     } catch (e) {

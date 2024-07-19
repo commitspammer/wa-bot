@@ -1,7 +1,7 @@
 <!doctype html>
 <nav class="p-4">
     <ul class="flex justify-between">
-        <li>
+        <li class="flex-1">
             <span class="bg-white text-black rounded-full p-1">
                 <i class="fa-phone fa-solid"></i>
             </span>
@@ -10,7 +10,7 @@
             <a href="/pages/client">Client</a>
             <a href="/pages/messages">Messages</a>
         </li>
-        <li>
+        <li class="flex-1 flex justify-end">
             <%- include('comps/status.ejs', { status: undefined }) %>
         </li>
     </ul>

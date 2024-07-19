@@ -5,7 +5,7 @@
             <img src="<%= message.media %>" class="rounded-xl w-full">
         </div>
         <p class="flex-1 px-4 py-2">
-            <%- message.text.replaceAll("\n", "<br>") %>
+            <%- message.text.replaceAll('\n', '<br>') %>
         </p>
         <div class="flex flex-col gap-2">
             <button class="p-1"
@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="flex p-1 flex-wrap gap-2">
-        <% for (gid of message.groupIds) { %>
+        <% for (gid of message.groupIds.slice(0,8)) { %>
             <div class="flex justify-center items-center w-8 h-8"
                 hx-get="/chats/<%= gid %>/icon"
                 hx-trigger="load"
@@ -44,5 +44,20 @@
                 <i class="fa-circle-notch fa-solid animate-spin"></i>
             </div>
         <% } %>
+        <% if (message.groupIds.length > 8) { %>
+            <div class="flex justify-center items-center w-8 h-8 bg-emerald-950 rounded-full text-xs">
+                +<%= message.groupIds.length - 8 %>
+            </div>
+        <% } %>
+        <div class="flex-1 flex justify-end p-1 gap-2 text-xs">
+            <div>
+                <i class="fa-hourglass-end fa-solid"></i>
+                Wait: <%= parseIntervalToStr(message.waitInterval) %>
+            </div>
+            <div>
+                <i class="fa-paper-plane fa-solid"></i>
+                Send: <%= parseIntervalToStr(message.sendInterval) %>
+            </div>
+        </div>
     </div>
 </article>

@@ -1,0 +1,50 @@
+<!doctype html>
+<div class="p-1">
+    <% const [value, unit] = parseIntervalToValueUnit(interval) %>
+    <% const dSelected = unit === 'd' ? 'selected' : '' %>
+    <% const hSelected = unit === 'h' ? 'selected' : '' %>
+    <% const mSelected = unit === 'm' ? 'selected' : '' %>
+    <% const sSelected = unit === 's' ? 'selected' : '' %>
+    <label>
+        <%= label.charAt(0).toUpperCase() + label.slice(1).toLowerCase() %>:
+    </label>
+    <select name="<%= label %>Value"
+        class="bg-emerald-950 px-1 py-0.5"
+    >
+        <option value="" disabled>000</option>
+    </select>
+    <select name="<%= label %>Unit"
+        class="bg-emerald-950 px-1 py-0.5"
+        onchange="<%= label %>OptUpdate(this)"
+    >
+        <option value="d" <%= dSelected %>>Days</option>
+        <option value="h" <%= hSelected %>>Hours</option>
+        <option value="m" <%= mSelected %>>Minutes</option>
+        <option value="s" <%= sSelected %>>Seconds</option>
+    </select>
+    <script>
+        var <%= label %>OptUpdate = (unitSelect) => {
+            let valueSelect = document.querySelector('select[name="<%= label %>Value"]');
+            valueSelect.innerHTML = '';
+            let minmax = [0, 1];
+            if (unitSelect.value === 'd') {
+                minmax = [1, 15];
+            } else if (unitSelect.value === 'h') {
+                minmax = [1, 72];
+            } else if (unitSelect.value === 'm') {
+                minmax = [1, 300];
+            } else if (unitSelect.value === 's') {
+                minmax = [1, 300];
+            }
+            let range = [...Array(minmax[1] + 1).keys()].slice(minmax[0]);
+            for (n of range) {
+                let selected = n === <%= value %> ? 'selected' : '';
+                let opt = `<option value="${n}" ${selected}>${n}</option>`;
+                valueSelect.insertAdjacentHTML('beforeend', opt);
+            }
+            let opt = `<option value="" disabled>000</option>`;
+            valueSelect.insertAdjacentHTML('beforeend', opt);
+        }
+        <%= label %>OptUpdate(document.querySelector('select[name="<%= label %>Unit"]'))
+    </script>
+</div>

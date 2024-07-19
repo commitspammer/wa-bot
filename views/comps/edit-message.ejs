@@ -5,7 +5,7 @@
     hx-swap="outerHTML"
     hx-disinherit="*"
 >
-<!-- disable the damned inheritance -->
+<!-- disabled the pesky inheritance -->
 <article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
     <div class="flex p-1">
         <div class="w-32 relative">
@@ -61,7 +61,11 @@
             </button>
         </div>
     </div>
-    <div hx-get="/groups/selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '')%>"
+    <div class="flex justify-end gap-4">
+        <%- include('comps/interval-builder.ejs', { label: 'wait', interval: message.waitInterval }) %>
+        <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval }) %>
+    </div>
+    <div hx-get="/groups-selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '')%>"
         hx-trigger="load"
         hx-swap="outerHTML"
     ></div>
