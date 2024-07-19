@@ -62,8 +62,8 @@
         </div>
     </div>
     <div class="flex justify-end gap-4">
-        <%- include('comps/interval-builder.ejs', { label: 'wait', interval: message.waitInterval }) %>
-        <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval }) %>
+        <%- include('comps/interval-builder.ejs', { label: 'wait', interval: message.waitInterval, id: 'wait'+message.id }) %>
+        <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval, id: 'send'+message.id }) %>
     </div>
     <div hx-get="/groups-selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '')%>"
         hx-trigger="load"

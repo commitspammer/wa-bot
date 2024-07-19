@@ -1,5 +1,7 @@
 <!doctype html>
 <div class="p-1">
+    <!-- what the fuck is this piece of shit? -->
+    <% const [valueId, unitId, updateFunc ] = ['value'+id, 'unit'+id, 'update'+id.replaceAll('-', '')] %>
     <% const [value, unit] = parseIntervalToValueUnit(interval) %>
     <% const dSelected = unit === 'd' ? 'selected' : '' %>
     <% const hSelected = unit === 'h' ? 'selected' : '' %>
@@ -8,14 +10,16 @@
     <label>
         <%= label.charAt(0).toUpperCase() + label.slice(1).toLowerCase() %>:
     </label>
-    <select name="<%= label %>Value"
+    <select id="<%= valueId %>"
+        name="<%= label %>Value"
         class="bg-emerald-950 px-1 py-0.5"
     >
         <option value="" disabled>000</option>
     </select>
-    <select name="<%= label %>Unit"
+    <select id="<%= unitId %>"
+        name="<%= label %>Unit"
         class="bg-emerald-950 px-1 py-0.5"
-        onchange="<%= label %>OptUpdate(this)"
+        onchange="<%= updateFunc %>(this)"
     >
         <option value="d" <%= dSelected %>>Days</option>
         <option value="h" <%= hSelected %>>Hours</option>
@@ -23,8 +27,8 @@
         <option value="s" <%= sSelected %>>Seconds</option>
     </select>
     <script>
-        var <%= label %>OptUpdate = (unitSelect) => {
-            let valueSelect = document.querySelector('select[name="<%= label %>Value"]');
+        var <%= updateFunc %> = (unitSelect) => {
+            let valueSelect = document.getElementById('<%= valueId %>');
             valueSelect.innerHTML = '';
             let minmax = [0, 1];
             if (unitSelect.value === 'd') {
@@ -45,6 +49,6 @@
             let opt = `<option value="" disabled>000</option>`;
             valueSelect.insertAdjacentHTML('beforeend', opt);
         }
-        <%= label %>OptUpdate(document.querySelector('select[name="<%= label %>Unit"]'))
+        <%= updateFunc %>(document.getElementById('<%= unitId %>'));
     </script>
 </div>
