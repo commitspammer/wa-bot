@@ -1,0 +1,13 @@
+<% const bgcolor = status === 'STOPPED' ? 'bg-red-800' : status === 'WAITING' ? 'bg-sky-700' : status === 'SENDING' ? 'bg-yellow-600' : 'bg-black' %>
+event: <%= event %>
+data: <!doctype html>
+data: <div class="flex justify-center items-center <%= bgcolor %> rounded-l-xl text-sm vertical-content">
+data:     <span class="rotate-180">
+data:         <%= status %>
+data:     </span>
+data: </div>
+data: <style>
+data:     .vertical-content {
+data:         writing-mode: vertical-rl;
+data:     }
+data: </style>

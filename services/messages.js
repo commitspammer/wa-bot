@@ -1,5 +1,6 @@
 const fs = require('fs').promises
 const { genUUID } = require('../lib/uuid.js')
+const EventEmitter = require('events')
 
 const Status = {
     stopped: 'STOPPED',
@@ -14,12 +15,18 @@ function MessagesService() {
         statuses: {},
     }
 
+    this.emitter = new EventEmitter()
+    this.on = (ev, cb) => this.emitter.on(ev, cb)
+    this.emit = (ev, data) => this.emitter.emit(ev, data)
+    this.removeListener = (ev, cb) => this.emitter.removeListener(ev, cb)
+
     this.getMessages = async () => {
         //TODO handle 'file not found' and 'empty file'
         const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
         for (i in messages) {
             if (CACHE.statuses[messages[i].id] === undefined) {
                 CACHE.statuses[messages[i].id] = Status.stopped
+                this.emitter.emit('status-changed', Status.stopped, messages[i])
             }
             if (CACHE.timeouts[messages[i].id] === undefined) {
                 CACHE.timeouts[messages[i].id] = []
@@ -53,18 +60,19 @@ function MessagesService() {
         }
     }
 
-    this.startMessage = async (m, send) => {
+    this.startMessage = async (m, send, restart) => {
         //TODO i might as well call getMessage(id)
         const messages = await this.getMessages()
         for (i in messages) {
             if (messages[i].id !== m.id) {
                 continue
             }
-            if (messages[i].status !== Status.stopped) {
+            if (messages[i].status !== Status.stopped && !restart) {
                 continue
             }
             const msg = messages[i]
             CACHE.statuses[msg.id] = Status.waiting
+            this.emitter.emit('status-changed', Status.waiting, msg)
             CACHE.timeouts[msg.id].push(setTimeout(() => {
                 const step = msg.sendInterval / msg.groupIds.length
                 for (j in msg.groupIds) {
@@ -74,8 +82,9 @@ function MessagesService() {
                     }, step * j))
                 }
                 CACHE.statuses[msg.id] = Status.sending
+                this.emitter.emit('status-changed', Status.sending, msg)
                 CACHE.timeouts[msg.id].push(setTimeout(() => {
-                    this.startMessage(msg, send)
+                    this.startMessage(msg, send, true)
                 }, msg.sendInterval))
             }, msg.waitInterval))
             return await this.getMessage(m.id)
@@ -86,6 +95,7 @@ function MessagesService() {
         CACHE.timeouts[m.id]?.forEach(t => clearTimeout(t))
         CACHE.timeouts[m.id] = []
         CACHE.statuses[m.id] = Status.stopped
+        this.emitter.emit('status-changed', Status.stopped, m)
         return await this.getMessage(m.id)
     }
 
@@ -98,6 +108,7 @@ function MessagesService() {
         }
         const messages = await this.getMessages()
         messages.push(msg)
+        messages.forEach(m => m.status = undefined)
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
         return await this.getMessage(msg.id)
     }
@@ -105,6 +116,7 @@ function MessagesService() {
     this.deleteMessage = async (id) => {
         let messages = await this.getMessages()
         messages = messages.filter(m => m.id !== id)
+        messages.forEach(m => m.status = undefined)
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
     }
 }

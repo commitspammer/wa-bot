@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const ejs = require('ejs')
 const wa = require('./services/whatsapp.js')
 const { MessagesService } = require('./services/messages.js')
 
@@ -46,8 +47,6 @@ app.locals.parseIntervalToValueUnit = (ms) => {
         : ms % (1000 * 60) === 0 ? [ms / (1000 * 60), 'm']
         : ms % (1000) === 0 ? [ms / (1000), 's'] : [ms, 'ms']
 }
-
-app.locals
 
 app.get('/favicon.ico', (req, res) => {
     res.status(204).send()
@@ -210,6 +209,45 @@ app.post('/messages/send/stop', async (req, res, next) => {
             await msg.stopMessage(m)
         }
         res.render('comps/messages', { messages: await msg.getMessages() })
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.get('/messages/:id/events', async (req, res, next) => {
+    try {
+        res.setHeader('Cache-Control', 'no-cache')
+        res.setHeader('Content-Type', 'text/event-stream')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Connection', 'keep-alive')
+        res.flushHeaders()
+        const id = req.params.id
+        const message = await msg.getMessage(id)
+        const writeEvent = (e) => (s, m) => {
+            if (m.id === message.id) {
+                //res.write(`event: status-changed\ndata: ${s} ${Date.now()}\n\n`)
+                const data = ejs.renderFile(__dirname + '/views/events/message-status.ejs', {
+                    event: e,
+                    status: s,
+                }, (err, data) => {
+                    if (!err) {
+                        console.log(`${data}\n\n`)
+                        res.write(`${data}\n\n`)
+                    } else {
+                        console.log(err)
+                    }
+                })
+            }
+        }
+        const writeEventStatusChanged = writeEvent('status-changed')
+        msg.on('status-changed', writeEventStatusChanged)
+        res.on('close', () => {
+            console.log('im dead')
+            msg.removeListener('status-changed', writeEventStatusChanged)
+            res.end()
+        })
+        const writeEventCurrentStatus = writeEvent('current-status')
+        writeEventCurrentStatus(message.status, message)
     } catch (e) {
         next(e)
     }

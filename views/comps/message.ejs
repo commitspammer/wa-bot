@@ -1,5 +1,5 @@
 <!doctype html>
-<article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
+<article id="message-<%= message.id %>" class="bg-emerald-900 rounded-r-xl">
     <div class="flex p-1">
         <div class="w-32">
             <img src="<%= message.media %>" class="rounded-xl w-full">
@@ -49,7 +49,7 @@
                 +<%= message.groupIds.length - 8 %>
             </div>
         <% } %>
-        <div class="flex-1 flex justify-end p-1 gap-2 text-xs">
+        <div class="flex-1 flex justify-end items-center p-1 gap-2 text-xs">
             <div>
                 <i class="fa-hourglass-end fa-solid"></i>
                 Wait: <%= parseIntervalToStr(message.waitInterval) %>
