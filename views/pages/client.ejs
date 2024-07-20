@@ -13,7 +13,8 @@
     <body class="bg-emerald-950 text-white">
         <%- include('comps/navbar.ejs') %>
         <main class="container p-4 mx-auto">
-            <div class="flex justify-between place-items-center">
+            <div class="flex justify-between items-center">
+                <%- include('comps/status.ejs', { status: undefined }) %>
                 <div class="shrink">
                     <%- include('comps/load-qrcode.ejs') %>
                 </div>

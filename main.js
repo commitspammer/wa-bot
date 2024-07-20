@@ -230,24 +230,18 @@ app.get('/messages/:id/events', async (req, res, next) => {
                     event: e,
                     status: s,
                 }, (err, data) => {
-                    if (!err) {
-                        console.log(`${data}\n\n`)
-                        res.write(`${data}\n\n`)
-                    } else {
-                        console.log(err)
-                    }
+                    err ? console.log(err) : res.write(`${data}\n\n`)
                 })
             }
         }
+        const writeEventCurrentStatus = writeEvent('current-status')
+        writeEventCurrentStatus(message.status, message)
         const writeEventStatusChanged = writeEvent('status-changed')
         msg.on('status-changed', writeEventStatusChanged)
         res.on('close', () => {
-            console.log('im dead')
             msg.removeListener('status-changed', writeEventStatusChanged)
             res.end()
         })
-        const writeEventCurrentStatus = writeEvent('current-status')
-        writeEventCurrentStatus(message.status, message)
     } catch (e) {
         next(e)
     }

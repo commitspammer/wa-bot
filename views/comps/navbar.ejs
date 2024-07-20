@@ -1,17 +1,19 @@
 <!doctype html>
 <nav class="p-4">
-    <ul class="flex justify-between">
+    <ul class="flex justify-between items-center">
         <li class="flex-1">
-            <span class="bg-white text-black rounded-full p-1">
+            <div class="p-1">
                 <i class="fa-phone fa-solid"></i>
-            </span>
+            </div>
         </li>
         <li class="flex space-x-4">
             <a href="/pages/client">Client</a>
             <a href="/pages/messages">Messages</a>
         </li>
         <li class="flex-1 flex justify-end">
-            <%- include('comps/status.ejs', { status: undefined }) %>
+            <div class="p-1">
+                <i class="fa-gear fa-solid"></i>
+            </div>
         </li>
     </ul>
 </nav>
