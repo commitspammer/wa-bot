@@ -10,10 +10,7 @@ const Status = {
 
 function MessagesService() {
     const SAVE_FILE_PATH = './save.json'
-    const CACHE = {
-        timeouts: {},
-        statuses: {},
-    }
+    const TIMEOUTS = {}
 
     this.emitter = new EventEmitter()
     this.on = (ev, cb) => this.emitter.on(ev, cb)
@@ -23,16 +20,7 @@ function MessagesService() {
     this.getMessages = async () => {
         //TODO handle 'file not found' and 'empty file'
         const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
-        for (i in messages) {
-            if (CACHE.statuses[messages[i].id] === undefined) {
-                CACHE.statuses[messages[i].id] = Status.stopped
-                this.emitter.emit('status-changed', Status.stopped, messages[i])
-            }
-            if (CACHE.timeouts[messages[i].id] === undefined) {
-                CACHE.timeouts[messages[i].id] = []
-            }
-            messages[i].status = CACHE.statuses[messages[i].id]
-        }
+        if (!messages) throw 'messages not found'
         return messages
     }
 
@@ -43,60 +31,81 @@ function MessagesService() {
         return msg
     }
 
-    this.updateMessage = async (m) => {
+    this.saveMessages = async (messages) => {
+        await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
+        return await this.getMessages()
+    }
+
+    this.saveMessage = async (msg) => {
         const messages = await this.getMessages()
         for (i in messages) {
-            if (messages[i].id === m.id) {
-                messages[i].text = m.text
-                messages[i].groupIds = m.groupIds
-                messages[i].media = m.media
-                messages[i].waitInterval = m.waitInterval
-                messages[i].sendInterval = m.sendInterval
-                messages[i].status = undefined
-                messages[i].timeouts = undefined
-                await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
-                return await this.getMessage(m.id)
+            if (messages[i].id === msg.id) {
+                messages[i] = msg
+                await this.saveMessages(messages)
+                return await this.getMessage(msg.id)
             }
         }
+    }
+
+    this.updateMessage = async (msg) => { //->editMessage
+        const messages = await this.getMessages()
+        for (i in messages) {
+            if (messages[i].id === msg.id) {
+                messages[i].text = msg.text
+                messages[i].groupIds = msg.groupIds
+                messages[i].media = msg.media
+                messages[i].waitInterval = msg.waitInterval
+                messages[i].sendInterval = msg.sendInterval
+                //messages[i].status = msg.status
+                //messages[i].timeouts = msg.timeouts
+                await this.saveMessages(messages)
+                return await this.getMessage(msg.id)
+            }
+        }
+    }
+
+    this.setMessageState = async (id, status) => {
+        let msg = await this.getMessage(id)
+        msg.status = status
+        msg = await this.saveMessage(msg)
+        this.emitter.emit('status-changed', status, msg)
+        return msg
+    }
+
+    this.pushMessageTimeout = async (id, timeout) => {
+        let msg = await this.getMessage(id)
+        if (!TIMEOUTS[msg.id]) TIMEOUTS[msg.id] = []
+        TIMEOUTS[msg.id].push(timeout)
+        return msg
     }
 
     this.startMessage = async (m, send, restart) => {
-        //TODO i might as well call getMessage(id)
-        const messages = await this.getMessages()
-        for (i in messages) {
-            if (messages[i].id !== m.id) {
-                continue
-            }
-            if (messages[i].status !== Status.stopped && !restart) {
-                continue
-            }
-            const msg = messages[i]
-            CACHE.statuses[msg.id] = Status.waiting
-            this.emitter.emit('status-changed', Status.waiting, msg)
-            CACHE.timeouts[msg.id].push(setTimeout(() => {
-                const step = msg.sendInterval / msg.groupIds.length
-                for (j in msg.groupIds) {
-                    const gid = msg.groupIds[j]
-                    CACHE.timeouts[msg.id].push(setTimeout(() => {
-                        send(gid, msg.text, msg.media)
-                    }, step * j))
-                }
-                CACHE.statuses[msg.id] = Status.sending
-                this.emitter.emit('status-changed', Status.sending, msg)
-                CACHE.timeouts[msg.id].push(setTimeout(() => {
-                    this.startMessage(msg, send, true)
-                }, msg.sendInterval))
-            }, msg.waitInterval))
-            return await this.getMessage(m.id)
+        let msg = await this.getMessage(m.id)
+        if (msg.status !== Status.stopped && !restart) {
+            return msg
         }
+        msg = await this.setMessageState(msg.id, Status.waiting)
+        await this.pushMessageTimeout(msg.id, setTimeout(() => {
+            const step = msg.sendInterval / msg.groupIds.length
+            this.setMessageState(msg.id, Status.sending)
+            for (i in msg.groupIds) {
+                const gid = msg.groupIds[i]
+                this.pushMessageTimeout(msg.id, setTimeout(() => {
+                    send(gid, msg.text, msg.media)
+                }, step * i))
+            }
+            this.pushMessageTimeout(msg.id, setTimeout(() => {
+                this.startMessage(msg, send, true)
+            }, msg.sendInterval))
+        }, msg.waitInterval))
+        return await this.getMessage(m.id)
     }
 
     this.stopMessage = async (m) => {
-        CACHE.timeouts[m.id]?.forEach(t => clearTimeout(t))
-        CACHE.timeouts[m.id] = []
-        CACHE.statuses[m.id] = Status.stopped
-        this.emitter.emit('status-changed', Status.stopped, m)
-        return await this.getMessage(m.id)
+        let msg = await this.getMessage(m.id)
+        TIMEOUTS[msg.id]?.forEach(t => clearTimeout(t))
+        TIMEOUTS[msg.id] = []
+        return await this.setMessageState(msg.id, Status.stopped)
     }
 
     this.createEmptyMessage = async () => {
@@ -105,19 +114,19 @@ function MessagesService() {
             text: "",
             media: null,
             groupIds: [],
+            timeouts: [],
+            status: Status.stopped,
+            lastStatusChange: Date.now(),
         }
         const messages = await this.getMessages()
         messages.push(msg)
-        messages.forEach(m => m.status = undefined)
-        await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
-        return await this.getMessage(msg.id)
+        return await this.saveMessages(messages)
     }
 
     this.deleteMessage = async (id) => {
         let messages = await this.getMessages()
         messages = messages.filter(m => m.id !== id)
-        messages.forEach(m => m.status = undefined)
-        await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
+        return await this.saveMessages(messages)
     }
 }
 
