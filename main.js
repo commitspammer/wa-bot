@@ -22,6 +22,7 @@ app.use(express.static('public'))
 app.use(express.json({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
 app.set('port', process.env.PORT || '4807')
+app.set('host', process.env.HOST || 'localhost')
 app.set('view engine', 'ejs')
 app.set('views', ['views', 'views/pages', 'views/comps', 'views/events'].map(s => __dirname+'/'+s))
 app.set('whatsapp service', wa)
@@ -262,8 +263,8 @@ app.delete('/messages/:id', async (req, res, next) => {
     }
 })
 
-app.listen(app.get('port'), () => {
-    console.log(`Server running on http://localhost:${app.get('port')}`)
+app.listen(app.get('port'), app.get('host'), () => {
+    console.log(`Server running on http://${app.get('host')}:${app.get('port')}`)
 })
 
 module.exports = app

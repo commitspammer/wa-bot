@@ -122,6 +122,10 @@ function MessagesService() {
             text: "",
             media: null,
             groupIds: [],
+            waitInterval: '3600000',
+            sendInterval: '3600000',
+            state: Status.stopped,
+            changedAt: Date.now(),
         }
         const messages = await this.getMessages()
         messages.push(msg)

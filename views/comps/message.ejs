@@ -1,14 +1,18 @@
 <!doctype html>
 <article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
     <div class="flex flex-col sm:flex-row p-1">
-        <div class="w-full sm:w-32">
-            <img src="<%= message.media %>" class="rounded-xl w-full">
-        </div>
-        <p class="flex-1 px-4 py-2">
+            <div class="flex">
+                <div class="flex-1 sm:w-32">
+                    <img src="<%= message.media %>" class="rounded-xl w-full">
+                </div>
+                <div class="flex flex-col-reverse gap-2 sm:hidden ml-1">
+                    <%- include('comps/message-actions.ejs', { message }) %>
+                </div>
+            </div>
+        <p class="flex-1 p-1 sm:px-4 sm:py-2">
             <%- message.text.replaceAll('\n', '<br>') %>
         </p>
-        <% const bgcolor = message.status === 'STOPPED' ? 'bg-red-800' : message.status === 'WAITING' ? 'bg-sky-700' : message.status === 'SENDING' ? 'bg-yellow-600' : 'bg-black' %>
-        <div class="px-4 text-xs">
+        <div class="p-1 sm:p-0 sm:px-4 text-xs">
             <div class="contents"
                 hx-ext="sse"
                 sse-connect="/messages/<%= message.id %>/events"
@@ -17,31 +21,8 @@
                 <i class="fa-circle-notch fa-solid animate-spin"></i>
             </div>
         </div>
-        <div class="flex flex-col gap-2">
-            <button class="p-1"
-                hx-get="/messages/<%= message.id %>/edit"
-                hx-target="#message-<%= message.id %>"
-                hx-swap="outerHTML"
-            >
-                <i class="fa-pencil fa-solid"></i>
-            </button>
-            <% if (message.status === 'STOPPED') { %>
-                <button class="p-1"
-                    hx-post="/messages/<%= message.id %>/send/start"
-                    hx-target="#message-<%= message.id %>"
-                    hx-swap="outerHTML"
-                >
-                    <i class="fa-circle-play fa-solid"></i>
-                </button>
-            <% } else { %>
-                <button class="p-1"
-                    hx-post="/messages/<%= message.id %>/send/stop"
-                    hx-target="#message-<%= message.id %>"
-                    hx-swap="outerHTML"
-                >
-                    <i class="fa-circle-stop fa-regular"></i>
-                </button>
-            <% } %>
+        <div class="flex flex-col gap-2 hidden sm:flex">
+            <%- include('comps/message-actions.ejs', { message }) %>
         </div>
     </div>
     <div class="flex p-1 flex-wrap gap-2">
