@@ -1,5 +1,10 @@
 <!doctype html>
-<div hx-get="/qrcode"
+<div class="p-2 bg-emerald-900 rounded-xl"
+    hx-get="/client/qrcode"
     hx-trigger="load delay:3s"
     hx-swap="outerHTML"
-></div>
+>
+    <div class="flex justify-center items-center w-[256px] h-[256px]">
+        <i class="fa-spinner fa-solid fa-2x animate-spin"></i>
+    </div>
+</div>

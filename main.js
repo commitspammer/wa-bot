@@ -64,7 +64,7 @@ app.get('/pages/messages', (req, res) => {
     res.render('pages/messages')
 })
 
-app.get('/qrcode', (req, res) => {
+app.get('/client/qrcode', (req, res) => {
     const qr = wa.getQR()
     if (qr) {
         res.render('comps/qrcode', { qrvalue: qr })
@@ -73,9 +73,14 @@ app.get('/qrcode', (req, res) => {
     }
 })
 
-app.get('/status', (req, res) => {
+app.get('/client/status', (req, res) => {
     const status = wa.getStatus()
     res.render('comps/status', { status: status })
+})
+
+app.post('/client/disconnect', async (req, res) => {
+    await wa.disconnect()
+    res.status(204).send()
 })
 
 app.get('/groups-selector', async (req, res, next) => {
@@ -88,7 +93,7 @@ app.get('/groups-selector', async (req, res, next) => {
     }
 })
 
-app.get('/chats/:id/icon', async (req, res, next) => {
+app.get('/client/chats/:id/icon', async (req, res, next) => {
     try {
         const id = req.params.id
         const url = await wa.getChatPicUrl(id, {

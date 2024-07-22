@@ -1,5 +1,7 @@
 <!doctype html>
-<nav class="p-4">
+<nav class="p-3">
+    <% const clientBg = selected === 'client' ? 'bg-emerald-900' : ''  %>
+    <% const messagesBg = selected === 'messages' ? 'bg-emerald-900' : ''  %>
     <ul class="flex justify-between items-center">
         <li class="flex-1">
             <div class="p-1">
@@ -7,8 +9,12 @@
             </div>
         </li>
         <li class="flex space-x-4">
-            <a href="/pages/client">Client</a>
-            <a href="/pages/messages">Messages</a>
+            <a href="/pages/client" class="px-2 py-1 rounded-xl <%= clientBg %>">
+                Client
+            </a>
+            <a href="/pages/messages" class="px-2 py-1 rounded-xl <%= messagesBg %>">
+                Messages
+            </a>
         </li>
         <li class="flex-1 flex justify-end">
             <div class="p-1">

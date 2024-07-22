@@ -11,7 +11,7 @@
                 <% } %>
             >
             <div class="flex justify-center items-center w-8 h-8"
-                hx-get="/chats/<%= g.id._serialized %>/icon"
+                hx-get="/client/chats/<%= g.id._serialized %>/icon"
                 hx-trigger="load delay:<%= + i + 1 %>s"
                 hx-swap="outerHTML"
             >

@@ -1,22 +1,22 @@
 <!doctype html>
-<div class="p-2 bg-white"
-    hx-get="/qrcode"
+<div class="p-2 bg-white rounded-xl"
+    hx-get="/client/qrcode"
     hx-trigger="load delay:32s"
     hx-swap="outerHTML"
 >
     <div id="qrcode"></div>
     <script type="text/javascript">
-        var qrcode = document.getElementById("qrcode");
+        var qrcode = document.getElementById('qrcode');
         try {
             new QRCode(qrcode, {
-                text: "<%= qrvalue %>",
+                text: '<%= qrvalue %>',
                 width: 256,
                 height: 256,
                 correctLevel : QRCode.CorrectLevel.H,
             });
         } catch {
-            qrcode.innerHTML = "failed loading qrcode";
-            console.warn("has qrcodejs been imported?");
+            qrcode.innerHTML = 'failed loading qrcode';
+            console.warn('has qrcodejs been imported?');
         }
     </script>
 </div>

@@ -37,7 +37,7 @@
     <div class="flex p-1 flex-wrap gap-2">
         <% for (gid of message.groupIds.slice(0,8)) { %>
             <div class="flex justify-center items-center w-8 h-8"
-                hx-get="/chats/<%= gid %>/icon"
+                hx-get="/client/chats/<%= gid %>/icon"
                 hx-trigger="load"
                 hx-swap="outerHTML"
             >

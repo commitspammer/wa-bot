@@ -7,29 +7,38 @@ const client = new Client({
 
 var status = "DISCONNECTED"
 const getStatus = () => status.toUpperCase()
-client.once('ready', () => {
+client.on('ready', () => {
     console.log('Ready!')
     status = "CONNECTED"
 })
-client.once('authenticated', () => {
+client.on('authenticated', () => {
     console.log('Authenticated!')
     status = "CONNECTING"
 })
-client.once('auth_failure', () => {
+client.on('auth_failure', () => {
     console.log('Failed to authenticate!')
     status = "UNAUTHENTICATED"
 })
-client.once('disconnected', () => {
+client.on('disconnected', () => { //this is bugged and never runs
     console.log('Disconnected!')
     status = "DISCONNECTED"
+    client.destroy()
+    client.initialize()
 })
-client.on('change_state', s => {
+client.on('change_state', s => { //this is bugged and never runs
     console.log(`New state: ${state}`)
 })
 
 const initialize = () => {
     status = "INITIALIZING"
     client.initialize().then(() => console.log('Initialized!'))
+}
+
+const disconnect = async () => {
+    await client.logout()
+    status = "DISCONNECTED" //these 3 lines shouldnt have to be here, but
+    client.destroy()        //theres this whatsappweb.js bug which makes
+    client.initialize()     //event:disconnected never be thrown
 }
 
 var qr = null
@@ -78,4 +87,4 @@ const sendMessage = async (chatId, content, mediaUrl) => {
     }
 }
 
-module.exports = { initialize, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }
+module.exports = { initialize, disconnect, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }
