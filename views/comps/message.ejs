@@ -50,6 +50,11 @@
             </div>
         <% } %>
         <div class="flex-1 flex justify-end items-center p-1 gap-2 text-xs">
+            <% if (message.status === 'WAITING') { %>
+                <%- include('comps/countdown.ejs', { id: message.id, time: message.changedAt + message.waitInterval }) %>
+            <% } else if (message.status === 'SENDING') { %>
+                <%- include('comps/countdown.ejs', { id: message.id, time: message.changedAt + message.sendInterval }) %>
+            <% } %>
             <div>
                 <i class="fa-hourglass-end fa-solid"></i>
                 Wait: <%= parseIntervalToStr(message.waitInterval) %>

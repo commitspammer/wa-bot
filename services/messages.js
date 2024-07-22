@@ -13,6 +13,7 @@ function MessagesService() {
     const CACHE = {
         timeouts: {},
         statuses: {},
+        changedAt: {},
     }
 
     this.emitter = new EventEmitter()
@@ -24,6 +25,9 @@ function MessagesService() {
         //TODO handle 'file not found' and 'empty file'
         const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
         for (i in messages) {
+            if (CACHE.changedAt[messages[i].id] === undefined) {
+                CACHE.changedAt[messages[i].id] = Date.now()
+            }
             if (CACHE.statuses[messages[i].id] === undefined) {
                 CACHE.statuses[messages[i].id] = Status.stopped
                 this.emitter.emit('status-changed', Status.stopped, messages[i])
@@ -32,6 +36,7 @@ function MessagesService() {
                 CACHE.timeouts[messages[i].id] = []
             }
             messages[i].status = CACHE.statuses[messages[i].id]
+            messages[i].changedAt = CACHE.changedAt[messages[i].id]
         }
         return messages
     }
@@ -53,6 +58,7 @@ function MessagesService() {
                 messages[i].waitInterval = m.waitInterval
                 messages[i].sendInterval = m.sendInterval
                 messages[i].status = undefined
+                messages[i].changedAt = undefined
                 messages[i].timeouts = undefined
                 await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
                 return await this.getMessage(m.id)
@@ -71,7 +77,12 @@ function MessagesService() {
                 continue
             }
             const msg = messages[i]
+            CACHE.timeouts[msg.id]?.forEach(t => clearTimeout(t))
+            CACHE.timeouts[msg.id] = []
             CACHE.statuses[msg.id] = Status.waiting
+            CACHE.changedAt[msg.id] = Date.now()
+            msg.status = CACHE.statuses[msg.id]
+            msg.changedAt = CACHE.changedAt[msg.id]
             this.emitter.emit('status-changed', Status.waiting, msg)
             CACHE.timeouts[msg.id].push(setTimeout(() => {
                 const step = msg.sendInterval / msg.groupIds.length
@@ -82,6 +93,9 @@ function MessagesService() {
                     }, step * j))
                 }
                 CACHE.statuses[msg.id] = Status.sending
+                CACHE.changedAt[msg.id] = Date.now()
+                msg.status = CACHE.statuses[msg.id]
+                msg.changedAt = CACHE.changedAt[msg.id]
                 this.emitter.emit('status-changed', Status.sending, msg)
                 CACHE.timeouts[msg.id].push(setTimeout(() => {
                     this.startMessage(msg, send, true)
@@ -95,6 +109,9 @@ function MessagesService() {
         CACHE.timeouts[m.id]?.forEach(t => clearTimeout(t))
         CACHE.timeouts[m.id] = []
         CACHE.statuses[m.id] = Status.stopped
+        CACHE.changedAt[m.id] = Date.now()
+        m.status = CACHE.statuses[m.id]
+        m.changedAt = CACHE.changedAt[m.id]
         this.emitter.emit('status-changed', Status.stopped, m)
         return await this.getMessage(m.id)
     }

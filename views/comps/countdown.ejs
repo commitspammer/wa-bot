@@ -1,0 +1,23 @@
+<!doctype html>
+<div id="countdown-<%= id %>"></div>
+<script>
+    var startCountdown = (time, id) => {
+        let countdown = setInterval(() => {
+            let now = new Date().getTime();
+            let distance =  time - now;
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            if (distance < 0) {
+                clearInterval(countdown);
+            }
+            try {
+                document.getElementById(id).innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+            } catch {
+                clearInterval(countdown);
+            }
+        }, 1000);
+    };
+    startCountdown("<%= time %>", "countdown-<%= id %>");
+</script>
