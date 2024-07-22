@@ -23,7 +23,7 @@ app.use(express.json({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
 app.set('port', process.env.PORT || '4807')
 app.set('view engine', 'ejs')
-app.set('views', ['views', 'views/pages',' views/comps'].map(s => __dirname+'/'+s))
+app.set('views', ['views', 'views/pages', 'views/comps', 'views/events'].map(s => __dirname+'/'+s))
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
 
@@ -230,12 +230,12 @@ app.get('/messages/:id/events', async (req, res, next) => {
         const message = await msg.getMessage(id)
         const writeEvent = (e) => (s, m) => {
             if (m.id === message.id) {
-                //res.write(`event: status-changed\ndata: ${s} ${Date.now()}\n\n`)
-                const data = ejs.renderFile(__dirname + '/views/events/message-status.ejs', {
+                req.app.render('events/message-status.ejs', {
                     event: e,
-                    status: s,
+                    message: m,
                 }, (err, data) => {
-                    err ? console.log(err) : res.write(`${data}\n\n`)
+                    const body = 'event: ' + e + '\n' + data.replaceAll('\n', '\ndata: ')
+                    err ? console.log(err) : res.write(`${body}\n\n`)
                 })
             }
         }

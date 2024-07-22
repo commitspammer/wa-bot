@@ -1,13 +1,18 @@
-<% const bgcolor = status === 'STOPPED' ? 'bg-red-800' : status === 'WAITING' ? 'bg-sky-700' : status === 'SENDING' ? 'bg-yellow-600' : 'bg-black' %>
-event: <%= event %>
-data: <!doctype html>
-data: <div class="flex justify-center items-center <%= bgcolor %> rounded-l-xl text-sm vertical-content">
-data:     <span class="rotate-180">
-data:         <%= status %>
-data:     </span>
-data: </div>
-data: <style>
-data:     .vertical-content {
-data:         writing-mode: vertical-rl;
-data:     }
-data: </style>
+<!doctype html>
+<% const bgcolor = message.status === 'STOPPED' ? 'bg-red-800' : message.status === 'WAITING' ? 'bg-sky-700' : message.status === 'SENDING' ? 'bg-yellow-600' : 'bg-black' %>
+<div class="flex flex-row sm:flex-col justify-between sm:justify-end gap-2 px-4 py-2 sm:w-32 <%= bgcolor %> rounded-xl">
+    <div>
+        <i class="fa-hourglass-end fa-solid"></i>
+        Wait: <%= parseIntervalToStr(message.waitInterval) %>
+    </div>
+    <div>
+        <i class="fa-paper-plane fa-solid"></i>
+        Send: <%= parseIntervalToStr(message.sendInterval) %>
+    </div>
+    <%= message.status %>
+    <% if (message.status === 'WAITING') { %>
+        <%- include('comps/countdown.ejs', { id: message.id, time: + message.changedAt + + message.waitInterval }) %>
+    <% } else if (message.status === 'SENDING') { %>
+        <%- include('comps/countdown.ejs', { id: message.id, time: + message.changedAt + + message.sendInterval }) %>
+    <% } %>
+</div>

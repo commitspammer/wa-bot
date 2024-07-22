@@ -1,12 +1,22 @@
 <!doctype html>
-<article id="message-<%= message.id %>" class="bg-emerald-900 rounded-r-xl">
-    <div class="flex p-1">
-        <div class="w-32">
+<article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
+    <div class="flex flex-col sm:flex-row p-1">
+        <div class="w-full sm:w-32">
             <img src="<%= message.media %>" class="rounded-xl w-full">
         </div>
         <p class="flex-1 px-4 py-2">
             <%- message.text.replaceAll('\n', '<br>') %>
         </p>
+        <% const bgcolor = message.status === 'STOPPED' ? 'bg-red-800' : message.status === 'WAITING' ? 'bg-sky-700' : message.status === 'SENDING' ? 'bg-yellow-600' : 'bg-black' %>
+        <div class="px-4 text-xs">
+            <div class="contents"
+                hx-ext="sse"
+                sse-connect="/messages/<%= message.id %>/events"
+                sse-swap="current-status,status-changed"
+            >
+                <i class="fa-circle-notch fa-solid animate-spin"></i>
+            </div>
+        </div>
         <div class="flex flex-col gap-2">
             <button class="p-1"
                 hx-get="/messages/<%= message.id %>/edit"
@@ -44,25 +54,13 @@
                 <i class="fa-circle-notch fa-solid animate-spin"></i>
             </div>
         <% } %>
-        <% if (message.groupIds.length > 8) { %>
+        <% if (message.groupIds.length > 9) { %>
             <div class="flex justify-center items-center w-8 h-8 bg-emerald-950 rounded-full text-xs">
-                +<%= message.groupIds.length - 8 %>
+                +<%= message.groupIds.length - 9 %>
             </div>
         <% } %>
-        <div class="flex-1 flex justify-end items-center p-1 gap-2 text-xs">
-            <% if (message.status === 'WAITING') { %>
-                <%- include('comps/countdown.ejs', { id: message.id, time: message.changedAt + message.waitInterval }) %>
-            <% } else if (message.status === 'SENDING') { %>
-                <%- include('comps/countdown.ejs', { id: message.id, time: message.changedAt + message.sendInterval }) %>
-            <% } %>
-            <div>
-                <i class="fa-hourglass-end fa-solid"></i>
-                Wait: <%= parseIntervalToStr(message.waitInterval) %>
-            </div>
-            <div>
-                <i class="fa-paper-plane fa-solid"></i>
-                Send: <%= parseIntervalToStr(message.sendInterval) %>
-            </div>
+        <div class="flex-1 flex justify-end items-center p-1 gap-2 text-xs whitespace-nowrap">
+            <%= message.id %>
         </div>
     </div>
 </article>
