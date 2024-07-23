@@ -18,7 +18,11 @@
                 sse-connect="/messages/<%= message.id %>/events"
                 sse-swap="current-status,status-changed"
             >
-                <i class="fa-circle-notch fa-solid animate-spin"></i>
+                <div class="flex flex-row sm:flex-col justify-between sm:justify-end items-center gap-2 px-4 py-2 sm:w-32 bg-emerald-950 rounded-xl">
+                    <span class="opacity-0">...</span>
+                    <span class="opacity-0">...</span>
+                    <span class="opacity-0">...</span>
+                </div>
             </div>
         </div>
         <div class="w-[26px] flex flex-col gap-2 hidden sm:flex">

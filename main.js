@@ -186,9 +186,11 @@ app.post('/messages/:id/send/start', requireClient, async (req, res, next) => {
         m = await msg.startMessage(m, (gid, text, media) => {
             let md = media
             if (media && media[0] === '/') {
-                md = `http://localhost:${app.get('port')}${media}`
+                md = `http://${app.get('host')}:${app.get('port')}${media}`
             }
-            console.log(gid, text, md)
+            console.log('======================')
+            console.log({ ID: gid, Text: text, Media: md })
+            console.log('======================')
             wa.sendMessage(gid, text, md).catch(console.log)
         })
         res.render('comps/message', { message: m })
@@ -216,9 +218,11 @@ app.post('/messages/send/start', requireClient, async (req, res, next) => {
             await msg.startMessage(m, (gid, text, media) => {
                 let md = media
                 if (media && media[0] === '/') {
-                    md = `http://localhost:${app.get('port')}${media}`
+                    md = `http://${app.get('host')}:${app.get('port')}${media}`
                 }
-                console.log(gid, text, md)
+                console.log('======================')
+                console.log({ ID: gid, Text: text, Media: md })
+                console.log('======================')
                 wa.sendMessage(gid, text, md).catch(console.log)
             })
         }
