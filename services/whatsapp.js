@@ -5,23 +5,23 @@ const client = new Client({
     restartOnAuthFail: true,
 })
 
-var status = "DISCONNECTED"
+var status = 'DISCONNECTED'
 const getStatus = () => status.toUpperCase()
 client.on('ready', () => {
     console.log('Ready!')
-    status = "CONNECTED"
+    status = 'CONNECTED'
 })
 client.on('authenticated', () => {
     console.log('Authenticated!')
-    status = "CONNECTING"
+    status = 'CONNECTING'
 })
 client.on('auth_failure', () => {
     console.log('Failed to authenticate!')
-    status = "UNAUTHENTICATED"
+    status = 'UNAUTHENTICATED'
 })
 client.on('disconnected', () => { //this is bugged and never runs
     console.log('Disconnected!')
-    status = "DISCONNECTED"
+    status = 'DISCONNECTED'
     client.destroy()
     client.initialize()
 })
@@ -30,13 +30,15 @@ client.on('change_state', s => { //this is bugged and never runs
 })
 
 const initialize = () => {
-    status = "INITIALIZING"
+    status = 'INITIALIZING'
     client.initialize().then(() => console.log('Initialized!'))
 }
 
 const disconnect = async () => {
+    if (status === 'DISCONNECTED')
+        return
     await client.logout()
-    status = "DISCONNECTED" //these 3 lines shouldnt have to be here, but
+    status = 'DISCONNECTED' //these 3 lines shouldnt have to be here, but
     client.destroy()        //theres this whatsappweb.js bug which makes
     client.initialize()     //event:disconnected never be thrown
 }
@@ -44,7 +46,7 @@ const disconnect = async () => {
 var qr = null
 const getQR = () => qr
 client.on('qr', q => {
-    status = "DISCONNECTED"
+    status = 'DISCONNECTED'
     qr = q
 })
 

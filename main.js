@@ -18,15 +18,16 @@ const upload = multer({ storage: multer.diskStorage({
     }
 })})
 
-app.use(express.static('public'))
-app.use(express.json({ extended: true }))
-app.use(express.urlencoded({ extended: true }))
 app.set('port', process.env.PORT || '4807')
 app.set('host', process.env.HOST || 'localhost')
 app.set('view engine', 'ejs')
 app.set('views', ['views', 'views/pages', 'views/comps', 'views/events'].map(s => __dirname+'/'+s))
 app.set('whatsapp service', wa)
 app.set('messages service', msg)
+
+app.use(express.static('public'))
+app.use(express.json({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 
 app.locals.parseQueryList = (q) => {
     return [ q ].flatMap(x => x).filter(x => typeof x === 'string')
@@ -79,9 +80,13 @@ app.get('/client/status', (req, res) => {
     res.render('comps/status', { status: status })
 })
 
-app.post('/client/disconnect', async (req, res) => {
-    await wa.disconnect()
-    res.status(204).send()
+app.post('/client/disconnect', async (req, res, next) => {
+    try {
+        await wa.disconnect()
+        res.status(204).send()
+    } catch (e) {
+        next(e)
+    }
 })
 
 app.get('/groups-selector', async (req, res, next) => {
@@ -261,6 +266,11 @@ app.delete('/messages/:id', async (req, res, next) => {
     } catch (e) {
         next(e)
     }
+})
+
+app.use((err, req, res, next) => {
+    console.warn(err.stack)
+    res.status(500).send(err.stack)
 })
 
 app.listen(app.get('port'), app.get('host'), () => {
