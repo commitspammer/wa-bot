@@ -68,7 +68,9 @@ app.get('/pages/messages', (req, res) => {
 
 app.get('/client/qrcode', (req, res) => {
     const qr = wa.getQR()
-    if (qr) {
+    if (wa.getStatus() === 'CONNECTED') {
+        res.render('comps/no-qrcode')
+    } else if (qr) {
         res.render('comps/qrcode', { qrvalue: qr })
     } else {
         res.render('comps/load-qrcode')
@@ -102,8 +104,10 @@ app.get('/groups-selector', async (req, res, next) => {
 app.get('/client/chats/:id/icon', async (req, res, next) => {
     try {
         const id = req.params.id
+        const h = req.app.get('host')
+        const p = req.app.get('port')
         const url = await wa.getChatPicUrl(id, {
-            fallback: 'http://localhost:4807/failed-loading-image.png'
+            fallback: `http://${h}:${p}/failed-loading-image.png`
         })
         res.render('comps/chat-icon', { src: url })
     } catch (e) {

@@ -1,0 +1,15 @@
+<!doctype html>
+<div class="p-2 bg-emerald-900 rounded-xl no-qrcode-reload">
+    <div class="flex flex-col justify-center items-center gap-2 w-[256px] h-[256px]">
+        <div>
+            You are connected!
+        </div>
+        <button class="w-8 h-8 bg-emerald-800 rounded-xl"
+            hx-get="/client/qrcode"
+            hx-target="closest div.no-qrcode-reload"
+            hx-swap="outerHTML"
+        >
+            <i class="fa-rotate-right fa-solid"></i>
+        </button>
+    </div>
+</div>
