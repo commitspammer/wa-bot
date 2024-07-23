@@ -17,28 +17,14 @@
             <div class="flex flex-col justify-center items-center gap-4">
                 <%- include('comps/status.ejs', { status: undefined }) %>
                 <%- include('comps/load-qrcode.ejs') %>
-                <button class="px-2 py-1 rounded-xl bg-emerald-800"
+                <button class="px-2 py-1 rounded-xl bg-emerald-800 disabled:opacity-30"
                     hx-post="/client/disconnect"
-                    hx-disabled-elt
+                    hx-disabled-elt="this"
                 >
-                    <i class="htmx-indicator fa-spinner fa-solid animate-spin"></i>
                     Disconnect
-                    <i class="opacity-0 fa-spinner fa-solid"></i>
                 </button>
             </div>
         </main>
     </body>
-    <style>
-        .indicator {
-            display:none;
-        }
-        .htmx-request.indicator {
-            display:block;
-        }
-        .htmx-request .indicator {
-            display:block;
-        }
-    }
-    </style>
     <script src="/htmx-event-handlers.js"></script>
 </html>

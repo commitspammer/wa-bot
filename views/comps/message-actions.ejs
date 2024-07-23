@@ -1,25 +1,28 @@
 <!doctype html>
-<button class="p-1"
+<button class="p-1 disabled:opacity-30"
     hx-get="/messages/<%= message.id %>/edit"
     hx-target="#message-<%= message.id %>"
     hx-swap="outerHTML"
+    hx-disabled-elt="this"
 >
     <i class="fa-pencil fa-solid"></i>
 </button>
 <% if (message.status === 'STOPPED') { %>
-    <button class="p-1"
+    <button class="p-1 disabled:opacity-30"
         hx-post="/messages/<%= message.id %>/send/start"
         hx-target="#message-<%= message.id %>"
         hx-swap="outerHTML"
+        hx-disabled-elt="this"
     >
         <i class="fa-circle-play fa-solid"></i>
     </button>
 <% } else { %>
-    <button class="p-1"
+    <button class="p-1 disabled:opacity-30"
         hx-post="/messages/<%= message.id %>/send/stop"
         hx-target="#message-<%= message.id %>"
         hx-swap="outerHTML"
         hx-confirm="Are you sure you wish to STOP this message?"
+        hx-disabled-elt="this"
     >
         <i class="fa-circle-stop fa-regular"></i>
     </button>

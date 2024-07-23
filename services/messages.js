@@ -44,13 +44,16 @@ function MessagesService() {
     this.getMessage = async (id) => {
         const messages = await this.getMessages()
         const msg = messages.find(m => m.id === id)
-        if (!msg) throw 'message not found'
+        if (!msg) throw new Error('Message not found')
         return msg
     }
 
     this.updateMessage = async (m) => {
         const messages = await this.getMessages()
         for (i in messages) {
+            if (messages[i].status !== Status.stopped) {
+                throw new Error('Can\'t update a non-stopped message')
+            }
             if (messages[i].id === m.id) {
                 messages[i].text = m.text
                 messages[i].groupIds = m.groupIds

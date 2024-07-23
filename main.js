@@ -2,7 +2,7 @@ const express = require('express')
 const multer = require('multer')
 const ejs = require('ejs')
 const wa = require('./services/whatsapp.js')
-const { MessagesService } = require('./services/messages.js')
+const { MessagesService, Status } = require('./services/messages.js')
 
 wa.initialize()
 const msg = new MessagesService()
@@ -137,16 +137,28 @@ app.get('/messages/:id', async (req, res, next) => {
     }
 })
 
-app.get('/messages/:id/edit', async (req, res, next) => {
+const requireClient = (req, res, next) => {
+    if (wa.getStatus() === 'CONNECTED') {
+        next()
+    } else {
+        throw new Error('The whatsapp client is not connected')
+    }
+}
+
+app.get('/messages/:id/edit', requireClient, async (req, res, next) => {
     try {
         const id = req.params.id
-        res.render('comps/edit-message', { message: await msg.getMessage(id) })
+        const m = await msg.getMessage(id)
+        if (m.status !== Status.stopped) {
+            throw new Error('Stop the message before editing')
+        }
+        res.render('comps/edit-message', { message: m })
     } catch (e) {
         next(e)
     }
 })
 
-app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
+app.put('/messages/:id', upload.single('media'), requireClient, async (req, res, next) => {
     try {
         const id = req.params.id
         let m = await msg.getMessage(id)
@@ -163,7 +175,7 @@ app.put('/messages/:id', upload.single('media'), async (req, res, next) => {
     }
 })
 
-app.post('/messages/:id/send/start', async (req, res, next) => {
+app.post('/messages/:id/send/start', requireClient, async (req, res, next) => {
     try {
         const id = req.params.id
         let m = await msg.getMessage(id)
@@ -192,7 +204,7 @@ app.post('/messages/:id/send/stop', async (req, res, next) => {
     }
 })
 
-app.post('/messages/send/start', async (req, res, next) => {
+app.post('/messages/send/start', requireClient, async (req, res, next) => {
     try {
         const messages = await msg.getMessages()
         for (i in messages) {
@@ -270,7 +282,7 @@ app.delete('/messages/:id', async (req, res, next) => {
 
 app.use((err, req, res, next) => {
     console.warn(err.stack)
-    res.status(500).send(err.stack)
+    res.status(500).send(err.message + '\n\n\n\n\n\n' + err.stack)
 })
 
 app.listen(app.get('port'), app.get('host'), () => {

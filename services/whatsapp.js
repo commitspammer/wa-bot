@@ -17,7 +17,7 @@ client.on('authenticated', () => {
 })
 client.on('auth_failure', () => {
     console.log('Failed to authenticate!')
-    status = 'UNAUTHENTICATED'
+    status = 'FAILED'
 })
 client.on('disconnected', () => { //this is bugged and never runs
     console.log('Disconnected!')
@@ -36,7 +36,7 @@ const initialize = () => {
 
 const disconnect = async () => {
     if (status === 'DISCONNECTED')
-        return
+        throw new Error('Already disconnected')
     await client.logout()
     status = 'DISCONNECTED' //these 3 lines shouldnt have to be here, but
     client.destroy()        //theres this whatsappweb.js bug which makes

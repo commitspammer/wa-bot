@@ -1,21 +1,23 @@
 <!doctype html>
-<button class="p-1"
+<button class="p-1 disabled:opacity-30"
     type="button"
     hx-get="/messages/<%= message.id %>"
     hx-target="#message-<%= message.id %>"
     hx-swap="outerHTML"
+    hx-disabled-elt="this"
 >
     <i class="fa-delete-left fa-solid"></i>
 </button>
-<button type="submit" class="p-1">
+<button class="p-1 disabled:opacity-30" type="submit">
     <i class="fa-floppy-disk fa-solid"></i>
 </button>
-<button class="p-1"
+<button class="p-1 disabled:opacity-30"
     type="button"
     hx-delete="/messages/<%= message.id %>"
     hx-target="#message-<%= message.id %>"
     hx-swap="outerHTML"
     hx-confirm="Are you sure you wish to DELETE this message?"
+    hx-disabled-elt="this"
 >
     <i class="fa-trash fa-solid"></i>
 </button>
