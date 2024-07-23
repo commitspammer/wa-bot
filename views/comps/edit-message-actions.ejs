@@ -1,0 +1,21 @@
+<!doctype html>
+<button class="p-1"
+    type="button"
+    hx-get="/messages/<%= message.id %>"
+    hx-target="#message-<%= message.id %>"
+    hx-swap="outerHTML"
+>
+    <i class="fa-delete-left fa-solid"></i>
+</button>
+<button type="submit" class="p-1">
+    <i class="fa-floppy-disk fa-solid"></i>
+</button>
+<button class="p-1"
+    type="button"
+    hx-delete="/messages/<%= message.id %>"
+    hx-target="#message-<%= message.id %>"
+    hx-swap="outerHTML"
+    hx-confirm="Are you sure you wish to DELETE this message?"
+>
+    <i class="fa-trash fa-solid"></i>
+</button>

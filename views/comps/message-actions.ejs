@@ -19,6 +19,7 @@
         hx-post="/messages/<%= message.id %>/send/stop"
         hx-target="#message-<%= message.id %>"
         hx-swap="outerHTML"
+        hx-confirm="Are you sure you wish to STOP this message?"
     >
         <i class="fa-circle-stop fa-regular"></i>
     </button>

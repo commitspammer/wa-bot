@@ -7,61 +7,46 @@
 >
 <!-- disabled the pesky inheritance -->
 <article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
-    <div class="flex p-1">
-        <div class="w-32 relative">
-            <img id="media-img-<%= message.id %>" src="<%= message.media %>" class="rounded-xl w-full">
-            <div class="absolute top-0 right-0">
-                <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
-                    <i class="fa-upload fa-solid fa-xl"></i>
+    <div class="flex flex-col sm:flex-row p-1">
+        <div class="flex">
+            <div class="flex-1 w-32 relative">
+                <img id="media-img-<%= message.id %>" src="<%= message.media %>" class="rounded-xl w-full">
+                <div class="absolute top-0 right-0">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
+                        <i class="fa-upload fa-solid fa-xl"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="absolute top-0 left-0">
-                <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
-                    <i class="fa-trash fa-solid fa-xl"></i>
+                <div class="absolute top-0 left-0">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950/70 flex justify-center items-center">
+                        <i class="fa-trash fa-solid fa-xl"></i>
+                    </div>
                 </div>
+                <input type="file"
+                    id="media-input-<%= message.id %>"
+                    name="media"
+                    accept="image/*,video/*"
+                    class="absolute inset-y-0 inset-x-1/2 right-0 opacity-0 cursor-pointer"
+                >
+                <input type="text"
+                    id="media-delete-<%= message.id %>"
+                    name="deletemedia"
+                    value="false"
+                    class="absolute inset-y-0 inset-x-1/2 left-0 opacity-0 cursor-pointer"
+                ></input>
             </div>
-            <input type="file"
-                id="media-input-<%= message.id %>"
-                name="media"
-                accept="image/*,video/*"
-                class="absolute inset-y-0 inset-x-1/2 right-0 opacity-0 cursor-pointer"
-            >
-            <input type="text"
-                id="media-delete-<%= message.id %>"
-                name="deletemedia"
-                value="false"
-                class="absolute inset-y-0 inset-x-1/2 left-0 opacity-0 cursor-pointer"
-            ></input>
+            <div class="w-[26px] flex flex-col-reverse gap-2 sm:hidden ml-1">
+                <%- include('comps/edit-message-actions.ejs', { message }) %>
+            </div>
         </div>
-        <div class="flex-1 flex px-4 py-2">
-            <!-- yes, there has to be no identation inside textarea -->
-            <textarea name="text" rows="6" class="flex-1 bg-emerald-950"><%= message.text %></textarea>
+        <div class="flex-1 p-1 sm:px-4 sm:py-2">
+            <!-- yes, there can be no identation inside textarea -->
+            <textarea name="text" rows="6" class="w-full bg-emerald-950"><%= message.text %></textarea>
         </div>
-        <div class="flex flex-col gap-2">
-            <!-- type button is needed cuz buttons are submit by default -->
-            <button class="p-1"
-                type="button"
-                hx-get="/messages/<%= message.id %>"
-                hx-target="#message-<%= message.id %>"
-                hx-swap="outerHTML"
-            >
-                <i class="fa-delete-left fa-solid"></i>
-            </button>
-            <button type="submit" class="p-1">
-                <i class="fa-floppy-disk fa-solid"></i>
-            </button>
-            <button class="p-1"
-                type="button"
-                hx-delete="/messages/<%= message.id %>"
-                hx-target="#message-<%= message.id %>"
-                hx-swap="outerHTML"
-                hx-confirm="Are you sure you wish to delete this message?"
-            >
-                <i class="fa-trash fa-solid"></i>
-            </button>
+        <div class="w-[26px] flex flex-col gap-2 hidden sm:flex">
+            <%- include('comps/edit-message-actions.ejs', { message }) %>
         </div>
     </div>
-    <div class="flex justify-end gap-4">
+    <div class="flex flex-col sm:flex-row justify-evenly gap-1 sm:gap-4 p-1">
         <%- include('comps/interval-builder.ejs', { label: 'wait', interval: message.waitInterval, id: 'wait'+message.id }) %>
         <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval, id: 'send'+message.id }) %>
     </div>

@@ -1,14 +1,14 @@
 <!doctype html>
 <article id="message-<%= message.id %>" class="bg-emerald-900 rounded-xl">
     <div class="flex flex-col sm:flex-row p-1">
-            <div class="flex">
-                <div class="flex-1 sm:w-32">
-                    <img src="<%= message.media %>" class="rounded-xl w-full">
-                </div>
-                <div class="flex flex-col-reverse gap-2 sm:hidden ml-1">
-                    <%- include('comps/message-actions.ejs', { message }) %>
-                </div>
+        <div class="flex">
+            <div class="flex-1 sm:w-32">
+                <img src="<%= message.media %>" class="rounded-xl w-full">
             </div>
+            <div class="w-[26px] flex flex-col-reverse gap-2 sm:hidden ml-1">
+                <%- include('comps/message-actions.ejs', { message }) %>
+            </div>
+        </div>
         <p class="flex-1 p-1 sm:px-4 sm:py-2">
             <%- message.text.replaceAll('\n', '<br>') %>
         </p>
@@ -21,7 +21,7 @@
                 <i class="fa-circle-notch fa-solid animate-spin"></i>
             </div>
         </div>
-        <div class="flex flex-col gap-2 hidden sm:flex">
+        <div class="w-[26px] flex flex-col gap-2 hidden sm:flex">
             <%- include('comps/message-actions.ejs', { message }) %>
         </div>
     </div>
