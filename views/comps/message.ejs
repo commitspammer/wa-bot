@@ -45,7 +45,9 @@
             </div>
         <% } %>
         <div class="flex-1 flex justify-end items-center p-1 gap-2 text-xs whitespace-nowrap">
-            <%= message.id %>
+            <span class="cursor-default" title="<%= message.id %>">
+                <%= message.id.split('-')[0] || '' %>
+            </span>
         </div>
     </div>
 </article>
