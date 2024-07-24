@@ -1,6 +1,6 @@
 const fs = require('fs').promises
-const { genUUID } = require('../lib/uuid.js')
 const EventEmitter = require('events')
+const { genUUID } = require('../lib/uuid.js')
 
 const Status = {
     stopped: 'STOPPED',
@@ -44,17 +44,19 @@ function MessagesService({ saveFilePath }) {
     this.getMessage = async (id) => {
         const messages = await this.getMessages()
         const msg = messages.find(m => m.id === id)
-        if (!msg) throw new Error('Message not found')
+        if (!msg) {
+            throw new Error('Message not found')
+        }
         return msg
     }
 
     this.updateMessage = async (m) => {
         const messages = await this.getMessages()
         for (i in messages) {
-            if (messages[i].status !== Status.stopped) {
-                throw new Error('Can\'t update a non-stopped message')
-            }
             if (messages[i].id === m.id) {
+                if (messages[i].status !== Status.stopped) {
+                    throw new Error('Can\'t update a non-stopped message')
+                }
                 messages[i].text = m.text
                 messages[i].groupIds = m.groupIds
                 messages[i].media = m.media
