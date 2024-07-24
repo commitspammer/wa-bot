@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row p-1">
         <div class="flex">
             <div class="flex-1 sm:w-32">
-                <img src="<%= message.media %>" class="rounded-xl w-full">
+                <img src="<%= message.media %>" class="rounded-xl w-full text-xs" alt="[no img]">
             </div>
             <div class="w-[26px] flex flex-col-reverse gap-2 sm:hidden ml-1">
                 <%- include('comps/message-actions.ejs', { message }) %>
