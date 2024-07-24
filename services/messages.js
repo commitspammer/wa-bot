@@ -8,8 +8,8 @@ const Status = {
     sending: 'SENDING',
 }
 
-function MessagesService() {
-    const SAVE_FILE_PATH = './save.json'
+function MessagesService({ saveFilePath }) {
+    const SAVE_FILE_PATH = saveFilePath
     const CACHE = {
         timeouts: {},
         statuses: {},

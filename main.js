@@ -5,7 +5,9 @@ const wa = require('./services/whatsapp.js')
 const { MessagesService, Status } = require('./services/messages.js')
 
 wa.initialize()
-const msg = new MessagesService()
+const msg = new MessagesService({
+    saveFilePath: __dirname + '/save.json',
+})
 
 const app = express()
 const upload = multer({ storage: multer.diskStorage({
@@ -59,15 +61,16 @@ app.get('/', (req, res) => {
 })
 
 app.get('/pages/client', (req, res) => {
-    res.render('pages/client')
+    res.status(200).render('pages/client')
 })
 
 app.get('/pages/messages', (req, res) => {
-    res.render('pages/messages')
+    res.status(200).render('pages/messages')
 })
 
 app.get('/client/qrcode', (req, res) => {
     const qr = wa.getQR()
+    res.status(200)
     if (wa.getStatus() === 'CONNECTED') {
         res.render('comps/no-qrcode')
     } else if (qr) {
@@ -79,7 +82,7 @@ app.get('/client/qrcode', (req, res) => {
 
 app.get('/client/status', (req, res) => {
     const status = wa.getStatus()
-    res.render('comps/status', { status: status })
+    res.status(200).render('comps/status', { status: status })
 })
 
 app.post('/client/disconnect', async (req, res, next) => {
@@ -95,7 +98,7 @@ app.get('/groups-selector', async (req, res, next) => {
     try {
         const checkedIds = app.locals.parseQueryList(req.query.checked)
         const groups = await wa.getGroups()
-        res.render('comps/groups-selector', { groups, checkedIds })
+        res.status(200).render('comps/groups-selector', { groups, checkedIds })
     } catch (e) {
         next(e)
     }
@@ -109,7 +112,7 @@ app.get('/client/chats/:id/icon', async (req, res, next) => {
         const url = await wa.getChatPicUrl(id, {
             fallback: `http://${h}:${p}/failed-loading-image.png`
         })
-        res.render('comps/chat-icon', { src: url })
+        res.status(200).render('comps/chat-icon', { src: url })
     } catch (e) {
         next(e)
     }
@@ -118,7 +121,7 @@ app.get('/client/chats/:id/icon', async (req, res, next) => {
 app.post('/messages', async (req, res, next) => {
     try {
         await msg.createEmptyMessage()
-        res.render('comps/messages', { messages: await msg.getMessages() })
+        res.status(200).render('comps/messages', { messages: await msg.getMessages() })
     } catch (e) {
         next(e)
     }
@@ -126,7 +129,7 @@ app.post('/messages', async (req, res, next) => {
 
 app.get('/messages', async (req, res, next) => {
     try {
-        res.render('comps/messages', { messages: await msg.getMessages() })
+        res.status(200).render('comps/messages', { messages: await msg.getMessages() })
     } catch (e) {
         next(e)
     }
@@ -135,7 +138,7 @@ app.get('/messages', async (req, res, next) => {
 app.get('/messages/:id', async (req, res, next) => {
     try {
         const id = req.params.id
-        res.render('comps/message', { message: await msg.getMessage(id) })
+        res.status(200).render('comps/message', { message: await msg.getMessage(id) })
     } catch (e) {
         next(e)
     }
@@ -156,7 +159,7 @@ app.get('/messages/:id/edit', requireClient, async (req, res, next) => {
         if (m.status !== Status.stopped) {
             throw new Error('Stop the message before editing')
         }
-        res.render('comps/edit-message', { message: m })
+        res.status(200).render('comps/edit-message', { message: m })
     } catch (e) {
         next(e)
     }
@@ -173,7 +176,7 @@ app.put('/messages/:id', upload.single('media'), requireClient, async (req, res,
         m.waitInterval = app.locals.parseIntervalToMs(req.body.waitValue, req.body.waitUnit)
         m.sendInterval = app.locals.parseIntervalToMs(req.body.sendValue, req.body.sendUnit)
         m = await msg.updateMessage(m)
-        res.render('comps/message', { message: m })
+        res.status(200).render('comps/message', { message: m })
     } catch (e) {
         next(e)
     }
@@ -193,7 +196,7 @@ app.post('/messages/:id/send/start', requireClient, async (req, res, next) => {
             console.log('======================')
             wa.sendMessage(gid, text, md).catch(console.log)
         })
-        res.render('comps/message', { message: m })
+        res.status(200).render('comps/message', { message: m })
     } catch (e) {
         next(e)
     }
@@ -204,7 +207,7 @@ app.post('/messages/:id/send/stop', async (req, res, next) => {
         const id = req.params.id
         let m = await msg.getMessage(id)
         m = await msg.stopMessage(m)
-        res.render('comps/message', { message: m })
+        res.status(200).render('comps/message', { message: m })
     } catch (e) {
         next(e)
     }
@@ -226,7 +229,7 @@ app.post('/messages/send/start', requireClient, async (req, res, next) => {
                 wa.sendMessage(gid, text, md).catch(console.log)
             })
         }
-        res.render('comps/messages', { messages: await msg.getMessages() })
+        res.status(200).render('comps/messages', { messages: await msg.getMessages() })
     } catch (e) {
         next(e)
     }
@@ -239,7 +242,7 @@ app.post('/messages/send/stop', async (req, res, next) => {
             const m = messages[i]
             await msg.stopMessage(m)
         }
-        res.render('comps/messages', { messages: await msg.getMessages() })
+        res.status(200).render('comps/messages', { messages: await msg.getMessages() })
     } catch (e) {
         next(e)
     }
@@ -271,7 +274,7 @@ app.get('/messages/:id/events', async (req, res, next) => {
         msg.on('status-changed', writeEventStatusChanged)
         res.on('close', () => {
             msg.removeListener('status-changed', writeEventStatusChanged)
-            res.end()
+            res.status(200).end()
         })
     } catch (e) {
         next(e)
@@ -282,7 +285,7 @@ app.delete('/messages/:id', async (req, res, next) => {
     try {
         const id = req.params.id
         await msg.deleteMessage(id)
-        res.send('')
+        res.status(200).send('')
     } catch (e) {
         next(e)
     }
