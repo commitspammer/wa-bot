@@ -77,7 +77,7 @@ function MessagesService() {
                 continue
             }
             if (messages[i].status !== Status.stopped && !restart) {
-                continue
+                throw new Error('Can\'t start a non-stopped message')
             }
             const msg = messages[i]
             CACHE.timeouts[msg.id]?.forEach(t => clearTimeout(t))
@@ -132,15 +132,17 @@ function MessagesService() {
         }
         const messages = await this.getMessages()
         messages.push(msg)
-        messages.forEach(m => m.status = undefined)
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
         return await this.getMessage(msg.id)
     }
 
     this.deleteMessage = async (id) => {
         let messages = await this.getMessages()
+        let m = messages.find(m => m.id === id)
+        if (m && m.status !== Status.stopped) {
+            throw new Error('Can\'t delete a non-stopped message')
+        }
         messages = messages.filter(m => m.id !== id)
-        messages.forEach(m => m.status = undefined)
         await fs.writeFile(SAVE_FILE_PATH, JSON.stringify(messages, null, 4))
     }
 }
