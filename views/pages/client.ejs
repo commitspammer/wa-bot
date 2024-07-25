@@ -23,6 +23,15 @@
                 >
                     Disconnect
                 </button>
+                <button class="px-2 py-1 rounded-xl bg-emerald-800 disabled:opacity-30"
+                    hx-post="/client/clear-cache"
+                    hx-target="#cache-cleared"
+                    hx-swap="innerHTML"
+                    hx-disabled-elt="this"
+                >
+                    Clear cache
+                </button>
+                <div id="cache-cleared"></div>
             </div>
         </main>
     </body>

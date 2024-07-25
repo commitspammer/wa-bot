@@ -94,6 +94,15 @@ app.post('/client/disconnect', async (req, res, next) => {
     }
 })
 
+app.post('/client/clear-cache', async (req, res, next) => {
+    try {
+        wa.clearCache()
+        res.status(200).send('Cache successfully cleared. Please restart the bot (Ctrl+C -> npm start)')
+    } catch (e) {
+        next(e)
+    }
+})
+
 app.get('/groups-selector', async (req, res, next) => {
     try {
         const checkedIds = app.locals.parseQueryList(req.query.checked)

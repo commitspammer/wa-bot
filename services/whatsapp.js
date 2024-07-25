@@ -58,6 +58,12 @@ const disconnect = async () => {
     client.destroy().then(() => initialize()) //this line shouldnt have to be here, but theres this whatsappweb.js bug where event:disconnected isn't emitted after client.logout()
 }
 
+const clearCache = () => {
+    const fs = require('fs')
+    fs.rmSync(__dirname + '/../.wwebjs_cache', { recursive: true, force: true })
+    fs.rmSync(__dirname + '/../.wwebjs_auth', { recursive: true, force: true })
+}
+
 var groups = null
 const getGroups = async () => {
     try {
@@ -97,4 +103,4 @@ const sendMessage = async (chatId, content, mediaUrl) => {
     }
 }
 
-module.exports = { initialize, disconnect, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }
+module.exports = { initialize, disconnect, clearCache, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }
