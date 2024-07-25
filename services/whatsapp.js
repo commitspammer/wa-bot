@@ -5,50 +5,58 @@ const client = new Client({
     restartOnAuthFail: true,
 })
 
-var status = 'DISCONNECTED'
+var status = 'LOADING'
+var qr = null
+
 const getStatus = () => status.toUpperCase()
-client.on('ready', () => {
-    console.log('Ready!')
-    status = 'CONNECTED'
+const getQR = () => qr
+
+const initialize = () => {
+    qr = null
+    console.log('Initializing!')
+    status = 'INITIALIZING'
+    client.initialize()
+        .then(() => {
+            console.log('Initialized!')
+            status = 'DISCONNECTED'
+        })
+        .catch(() => {
+            console.log('Failed!')
+            status = 'FAILED (RESTART BOT)'
+        })
+}
+
+client.on('qr', q => {
+    console.log('QR!')
+    status = 'DISCONNECTED'
+    qr = q
 })
+
+client.on('disconnected', () => { //this is bugged and only runs when you logout from the mobile app
+    console.log('Disconnected!')
+    status = 'RESTARTING'
+    client.destroy().then(() => initialize())
+})
+
 client.on('authenticated', () => {
     console.log('Authenticated!')
     status = 'CONNECTING'
 })
-client.on('auth_failure', () => {
-    console.log('Failed to authenticate!')
-    status = 'FAILED'
-})
-client.on('disconnected', () => { //this is bugged and never runs
-    console.log('Disconnected!')
-    status = 'DISCONNECTED'
-    client.destroy()
-    client.initialize()
-})
-client.on('change_state', s => { //this is bugged and never runs
-    console.log(`New state: ${state}`)
-})
 
-const initialize = () => {
-    status = 'INITIALIZING'
-    client.initialize().then(() => console.log('Initialized!'))
-}
+client.on('ready', () => {
+    console.log('Ready!')
+    status = 'CONNECTED'
+})
 
 const disconnect = async () => {
     if (status === 'DISCONNECTED')
         throw new Error('Already disconnected')
+    if (status !== 'CONNECTED')
+        throw new Error('The client is not initialized')
     await client.logout()
-    status = 'DISCONNECTED' //these 3 lines shouldnt have to be here, but
-    client.destroy()        //theres this whatsappweb.js bug which makes
-    client.initialize()     //event:disconnected never be thrown
+    status = 'RESTARTING'
+    client.destroy().then(() => initialize()) //this line shouldnt have to be here, but theres this whatsappweb.js bug where event:disconnected isn't emitted after client.logout()
 }
-
-var qr = null
-const getQR = () => qr
-client.on('qr', q => {
-    status = 'DISCONNECTED'
-    qr = q
-})
 
 var groups = null
 const getGroups = async () => {
