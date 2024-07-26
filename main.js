@@ -200,10 +200,16 @@ app.post('/messages/:id/send/start', requireClient, async (req, res, next) => {
             if (media && media[0] === '/') {
                 md = `http://${app.get('host')}:${app.get('port')}${media}`
             }
-            console.log('======================')
-            console.log({ ID: gid, Text: text, Media: md })
-            console.log('======================')
-            wa.sendMessage(gid, text, md).catch(console.log)
+            console.log('====TRYING TO SEND NOW====')
+            console.log({
+                //Time: (new Date).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                Time: (new Date).toLocaleString('pt-BR'),
+                ID: gid, Text: text, Media: md
+            })
+            console.log('==========================')
+            wa.sendMessage(gid, text, md)
+                .then(() => console.log(`A message was sent to ${gid}`))
+                .catch(console.log)
         })
         res.status(200).render('comps/message', { message: m })
     } catch (e) {
@@ -232,10 +238,16 @@ app.post('/messages/send/start', requireClient, async (req, res, next) => {
                 if (media && media[0] === '/') {
                     md = `http://${app.get('host')}:${app.get('port')}${media}`
                 }
-                console.log('======================')
-                console.log({ ID: gid, Text: text, Media: md })
-                console.log('======================')
-                wa.sendMessage(gid, text, md).catch(console.log)
+                console.log('====TRYING TO SEND NOW====')
+                console.log({
+                    //Time: (new Date).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+                    Time: (new Date).toLocaleString('pt-BR'),
+                    ID: gid, Text: text, Media: md
+                })
+                console.log('==========================')
+                wa.sendMessage(gid, text, md)
+                    .then(() => console.log(`A message was sent to ${gid}`))
+                    .catch(console.log)
             })
         }
         res.status(200).render('comps/messages', { messages: await msg.getMessages() })
