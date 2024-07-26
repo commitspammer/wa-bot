@@ -18,11 +18,15 @@ const initialize = () => {
     client.initialize()
         .then(() => {
             console.log('Initialized!')
-            status = 'DISCONNECTED'
+            if (status !== 'DISCONNECTED') {
+                status = 'AUTHENTICATING'
+            } else {
+                status = 'INITIALIZED'
+            }
         })
         .catch(() => {
             console.log('Failed!')
-            status = 'FAILED (RESTART BOT)'
+            status = 'FAILED (restart bot)'
         })
 }
 

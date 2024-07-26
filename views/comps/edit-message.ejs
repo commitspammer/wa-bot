@@ -34,7 +34,7 @@
                     name="deletemedia"
                     value="false"
                     class="absolute inset-y-0 inset-x-1/2 left-0 opacity-0 cursor-pointer"
-                ></input>
+                >
             </div>
             <div class="w-[26px] flex flex-col-reverse gap-2 sm:hidden ml-1">
                 <%- include('comps/edit-message-actions.ejs', { message }) %>
@@ -52,10 +52,13 @@
         <%- include('comps/interval-builder.ejs', { label: 'wait', interval: message.waitInterval, id: 'wait'+message.id }) %>
         <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval, id: 'send'+message.id }) %>
     </div>
-    <div hx-get="/groups-selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '')%>"
+    <div class="flex justify-center items-center p-2"
+        hx-get="/groups-selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '') %>"
         hx-trigger="load"
         hx-swap="outerHTML"
-    ></div>
+    >
+        <i class="fa-circle-notch fa-solid animate-spin"></i>
+    </div>
     <script>
         var mediaInput = document.getElementById('media-input-<%= message.id %>');
         var mediaImg = document.getElementById('media-img-<%= message.id %>');
