@@ -1,5 +1,8 @@
 <!doctype html>
-<div class="space-y-2">
+<div class="space-y-2"
+    hx-ext="sse"
+    sse-connect="/messages/status/events"
+>
     <% if (messages.length === 0) { %>
         <div class="text-center">
             There are no messages. Click <i class="fa-square-plus fa-solid"></i> to create one.

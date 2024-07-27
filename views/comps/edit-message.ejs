@@ -54,7 +54,7 @@
     </div>
     <div class="flex justify-center items-center p-2"
         hx-get="/client/groups-selector?cached=true&<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '') %>"
-        hx-trigger="load"
+        hx-trigger="load delay:0.5s"
         hx-swap="outerHTML"
     >
         <i class="fa-circle-notch fa-solid animate-spin"></i>

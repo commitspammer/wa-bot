@@ -20,14 +20,17 @@
                 <button class="px-2 py-1 rounded-xl bg-emerald-800 disabled:opacity-30"
                     hx-post="/client/disconnect"
                     hx-disabled-elt="this"
+                    hx-confirm="Are you sure you want to disconnect the client?"
                 >
                     Disconnect
                 </button>
+                <!-- Cache clearing is temporarily disabled -->
                 <button class="px-2 py-1 rounded-xl bg-emerald-800 disabled:opacity-30"
                     hx-post="/client/clear-cache"
                     hx-target="#cache-cleared"
                     hx-swap="innerHTML"
                     hx-disabled-elt="this"
+                    disabled
                 >
                     Clear cache
                 </button>

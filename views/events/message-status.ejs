@@ -18,5 +18,5 @@
         <% } else if (message.status === 'SENDING') { %>
             <%- include('comps/countdown.ejs', { id: message.id, time: + message.changedAt + + message.sendInterval }) %>
         <% } %>
-    <div>
+    </div>
 </div>

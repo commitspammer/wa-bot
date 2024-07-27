@@ -22,6 +22,11 @@ const upload = multer({ storage: multer.diskStorage({
     }
 })})
 
+//app.use((req, res, next) => {
+//    console.log(req.originalUrl)
+//    next()
+//})
+
 app.set('port', process.env.PORT || '4807')
 app.set('host', process.env.HOST || 'localhost')
 app.set('view engine', 'ejs')
@@ -275,28 +280,27 @@ app.post('/messages/send/stop', async (req, res, next) => {
     }
 })
 
-app.get('/messages/:id/events', async (req, res, next) => {
+app.get('/messages/status/events', async (req, res, next) => {
     try {
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('Content-Type', 'text/event-stream')
-        res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Connection', 'keep-alive')
         res.flushHeaders()
-        const id = req.params.id
-        const message = await msg.getMessage(id)
         const writeEvent = (e) => (s, m) => {
-            if (m.id === message.id) {
-                req.app.render('events/message-status.ejs', {
-                    event: e,
-                    message: m,
-                }, (err, data) => {
-                    const body = 'event: ' + e + '\n' + data.replaceAll('\n', '\ndata: ')
-                    err ? console.log(err) : res.write(`${body}\n\n`)
-                })
-            }
+            const ev = e + '-' + m.id
+            req.app.render('events/message-status.ejs', {
+                event: ev,
+                message: m,
+            }, (err, data) => {
+                const body = 'event: ' + ev + '\n' + data.replaceAll('\n', '\ndata: ')
+                err ? console.log(err) : res.write(`${body}\n\n`)
+            })
         }
-        const writeEventCurrentStatus = writeEvent('current-status')
-        writeEventCurrentStatus(message.status, message)
+        const messages = await msg.getMessages()
+        for (i in messages) {
+            const writeEventCurrentStatus = writeEvent('current-status')
+            writeEventCurrentStatus(messages[i].status, messages[i])
+        }
         const writeEventStatusChanged = writeEvent('status-changed')
         msg.on('status-changed', writeEventStatusChanged)
         res.on('close', () => {
