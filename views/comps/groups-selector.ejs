@@ -45,3 +45,9 @@
         checkboxes.forEach(c => addEventListener('change', () => swapColor(c)));
     </script>
 </div>
+<button class="p-1 disabled:opacity-30"
+    type="submit"
+    hx-swap-oob="outerHTML:button.edit-message-actions-delayed"
+>
+    <i class="fa-floppy-disk fa-solid"></i>
+</button>
