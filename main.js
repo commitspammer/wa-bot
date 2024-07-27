@@ -4,7 +4,9 @@ const ejs = require('ejs')
 const wa = require('./services/whatsapp.js')
 const { MessagesService, Status } = require('./services/messages.js')
 
-wa.initialize()
+wa.initialize({
+    groupsFilePath: __dirname + '/groups.json',
+})
 const msg = new MessagesService({
     saveFilePath: __dirname + '/save.json',
 })
@@ -36,8 +38,8 @@ app.locals.parseQueryList = (q) => {
 }
 app.locals.parseIntervalToMs = (v, u) => {
     let c = u.charAt(0).toLowerCase()
-    return c == "d" ? v * 1000 * 60 * 60 * 24 : c == "h" ? v * 1000 * 60 * 60
-        : c == "m" ? v * 1000 * 60 : c == "s" ? v * 1000 : 0
+    return c == 'd' ? v * 1000 * 60 * 60 * 24 : c == 'h' ? v * 1000 * 60 * 60
+        : c == 'm' ? v * 1000 * 60 : c == 's' ? v * 1000 : 0
 }
 app.locals.parseIntervalToStr = (ms) => {
     return ms % (1000 * 60 * 60 * 24) === 0 ? `${ms / (1000 * 60 * 60 * 24)}d`
@@ -103,10 +105,16 @@ app.post('/client/clear-cache', async (req, res, next) => {
     }
 })
 
-app.get('/groups-selector', async (req, res, next) => {
+app.get('/client/groups-selector', async (req, res, next) => {
     try {
         const checkedIds = app.locals.parseQueryList(req.query.checked)
-        const groups = await wa.getGroups()
+        const cached = req.query.cached
+        let groups
+        if (cached === 'true') {
+            groups = await wa.getCachedGroups()
+        } else {
+            groups = await wa.getGroups()
+        }
         res.status(200).render('comps/groups-selector', { groups, checkedIds })
     } catch (e) {
         next(e)
@@ -202,7 +210,6 @@ app.post('/messages/:id/send/start', requireClient, async (req, res, next) => {
             }
             console.log('====TRYING TO SEND NOW====')
             console.log({
-                //Time: (new Date).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
                 Time: (new Date).toLocaleString('pt-BR'),
                 ID: gid, Text: text, Media: md
             })
@@ -240,7 +247,6 @@ app.post('/messages/send/start', requireClient, async (req, res, next) => {
                 }
                 console.log('====TRYING TO SEND NOW====')
                 console.log({
-                    //Time: (new Date).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
                     Time: (new Date).toLocaleString('pt-BR'),
                     ID: gid, Text: text, Media: md
                 })

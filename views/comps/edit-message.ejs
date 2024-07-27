@@ -53,7 +53,7 @@
         <%- include('comps/interval-builder.ejs', { label: 'send', interval: message.sendInterval, id: 'send'+message.id }) %>
     </div>
     <div class="flex justify-center items-center p-2"
-        hx-get="/groups-selector?<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '') %>"
+        hx-get="/client/groups-selector?cached=true&<%= message.groupIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '') %>"
         hx-trigger="load"
         hx-swap="outerHTML"
     >

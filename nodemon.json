@@ -1,6 +1,7 @@
 {
     "ext": "json,js,html,ejs",
     "ignore": [
-        "./save.json"
+        "./save.json",
+        "./groups.json"
     ]
 }

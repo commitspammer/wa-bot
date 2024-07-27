@@ -1,17 +1,20 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
+const fs = require('fs').promises
 
 const client = new Client({
     authStrategy: new LocalAuth(),
     restartOnAuthFail: true,
 })
 
+var GROUPS_FILE_PATH = undefined
 var status = 'LOADING'
 var qr = null
 
 const getStatus = () => status.toUpperCase()
 const getQR = () => qr
 
-const initialize = () => {
+const initialize = ({ groupsFilePath }) => {
+    GROUPS_FILE_PATH = groupsFilePath || undefined
     qr = null
     console.log('Initializing!')
     status = 'INITIALIZING'
@@ -57,28 +60,36 @@ const disconnect = async () => {
         throw new Error('Already disconnected')
     if (status !== 'CONNECTED')
         throw new Error('The client is not initialized')
-    await client.logout()
     status = 'RESTARTING'
+    await client.logout()
     client.destroy().then(() => initialize()) //this line shouldnt have to be here, but theres this whatsappweb.js bug where event:disconnected isn't emitted after client.logout()
 }
 
 const clearCache = () => {
-    const fs = require('fs')
-    fs.rmSync(__dirname + '/../.wwebjs_cache', { recursive: true, force: true })
-    fs.rmSync(__dirname + '/../.wwebjs_auth', { recursive: true, force: true })
+    const fsSync = require('fs')
+    fsSync.rmSync(__dirname + '/../.wwebjs_cache', { recursive: true, force: true })
+    fsSync.rmSync(__dirname + '/../.wwebjs_auth', { recursive: true, force: true })
 }
 
-var groups = null
 const getGroups = async () => {
-    try {
-        if (groups == null) {
-            const chats = await client.getChats()
-            groups = chats.filter(gc => gc.isGroup)
+    console.log('LOADING GROUPS FROM API...')
+    const chats = await client.getChats()
+    const groups = chats.filter(gc => gc.isGroup)
+    await fs.writeFile(GROUPS_FILE_PATH, JSON.stringify(groups, null, 4))
+    return groups
+}
+
+var cachedGroups = null
+
+const getCachedGroups = async () => {
+    if (cachedGroups == null) {
+        try {
+            cachedGroups = JSON.parse(await fs.readFile(GROUPS_FILE_PATH))
+        } catch (e) {
+            cachedGroups = getGroups()
         }
-        return groups
-    } catch (e) {
-        return null
     }
+    return cachedGroups
 }
 
 const getChatPicUrl = async (chatId, { fallback }) => {
@@ -107,4 +118,4 @@ const sendMessage = async (chatId, content, mediaUrl) => {
     }
 }
 
-module.exports = { initialize, disconnect, clearCache, getQR, getStatus, getGroups, getChatPicUrl, sendMessage }
+module.exports = { initialize, disconnect, clearCache, getQR, getStatus, getGroups, getCachedGroups, getChatPicUrl, sendMessage }

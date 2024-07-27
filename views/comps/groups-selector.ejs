@@ -1,5 +1,5 @@
 <!doctype html>
-<div class="md:columns-2 p-1 space-y-1">
+<div class="md:columns-2 p-1 space-y-1 groups-selector-update">
     <% for (i in groups) { %>
         <% const g = groups[i]; %>
         <label class="flex items-center gap-1 px-2 py-1 rounded-xl select-none">
@@ -20,6 +20,18 @@
             <%= g.name %>
         </label>
     <% } %>
+    <div class="flex justify-center px-2 py-1 disabled:opacity-30">
+        <button class="px-2 py-1 rounded-xl bg-emerald-800"
+            hx-get="/client/groups-selector?<%= checkedIds.map(id => 'checked=' + id).reduce((acc, next) => acc + '&' + next, '') %>"
+            hx-target="closest div.groups-selector-update"
+            hx-swap="outerHTML"
+            hx-confirm="Are you sure? Updating might take several minutes. Also, your unsaved selections will reset."
+            hx-disabled-elt="this"
+        >
+            <i class="fa-spinner fa-solid fa-xl animate-spin indicator-inline"></i>
+            Update groups
+        </button>
+    </div>
     <script>
         var swapColor = (el) => {
             if (el.checked) {
