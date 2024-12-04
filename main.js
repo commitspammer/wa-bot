@@ -5,10 +5,10 @@ const wa = require('./services/whatsapp.js')
 const { MessagesService, Status } = require('./services/messages.js')
 
 wa.initialize({
-    groupsFilePath: __dirname + '/groups.json',
+    groupsFilePath: __dirname + '/groups_cache.json',
 })
 const msg = new MessagesService({
-    saveFilePath: __dirname + '/save.json',
+    saveFilePath: __dirname + '/messages_save.json',
 })
 
 const app = express()

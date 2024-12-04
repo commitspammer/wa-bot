@@ -1,0 +1,26 @@
+[
+    {
+        "id": "048387e2-75d5-4aa3-ca32-52ac35c506b0",
+        "text": "Haii!!",
+        "media": null,
+        "groupIds": [
+            "120363316805860970@g.us"
+        ],
+        "waitInterval": 5000,
+        "sendInterval": 5000,
+        "state": "STOPPED",
+        "status": "STOPPED",
+        "changedAt": 1733333674885
+    },
+    {
+        "id": "844c15b1-c0de-4158-efc6-b32e41838a30",
+        "text": "Omg!!!",
+        "media": null,
+        "groupIds": [
+            "120363316443510903@g.us"
+        ],
+        "waitInterval": 5000,
+        "sendInterval": 5000,
+        "state": "STOPPED"
+    }
+]

@@ -1,4 +1,5 @@
-const fs = require('fs').promises
+const fsSync = require('fs')
+const fs = fsSync.promises
 const EventEmitter = require('events')
 const { genUUID } = require('../lib/uuid.js')
 
@@ -16,14 +17,25 @@ function MessagesService({ saveFilePath }) {
         changedAt: {},
     }
 
+    try {
+        JSON.parse(fsSync.readFileSync(SAVE_FILE_PATH))
+    } catch (e) {
+        console.log('Messages save file error. Creating empty save file...')
+        fsSync.writeFileSync(SAVE_FILE_PATH, JSON.stringify([], null, 4))
+    }
+
     this.emitter = new EventEmitter()
     this.on = (ev, cb) => this.emitter.on(ev, cb)
     this.emit = (ev, data) => this.emitter.emit(ev, data)
     this.removeListener = (ev, cb) => this.emitter.removeListener(ev, cb)
 
     this.getMessages = async () => {
-        //TODO handle 'file not found' and 'empty file'
-        const messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
+        var messages = null
+        try {
+            messages = JSON.parse(await fs.readFile(SAVE_FILE_PATH))
+        } catch (e) {
+            throw new Error('Failed reading messages save file')
+        }
         for (i in messages) {
             if (CACHE.changedAt[messages[i].id] === undefined) {
                 CACHE.changedAt[messages[i].id] = Date.now()
