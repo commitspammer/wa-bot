@@ -2,7 +2,7 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js')
 const fs = require('fs').promises
 
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    //authStrategy: new LocalAuth(),
     restartOnAuthFail: true,
 })
 
@@ -75,6 +75,7 @@ const getGroups = async () => {
     console.log('LOADING GROUPS FROM API...')
     const chats = await client.getChats()
     const groups = chats.filter(gc => gc.isGroup)
+    console.log('Creating groups cache file...')
     await fs.writeFile(GROUPS_FILE_PATH, JSON.stringify(groups, null, 4))
     return groups
 }
