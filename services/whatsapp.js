@@ -29,6 +29,7 @@ const initialize = ({ groupsFilePath }) => {
         })
         .catch(() => {
             console.log('Failed!')
+            console.log(e)
             status = 'FAILED (restart bot)'
         })
 }
